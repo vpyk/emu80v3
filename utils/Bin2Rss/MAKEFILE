@@ -1,0 +1,11 @@
+.AUTODEPEND
+
+OBJECTS = bin2rss.obj
+
+LIBPATH = f:\bc31\lib
+INCPATH = f:\bc31\include
+
+BCC_OPT = -ms -O1 -Oc -d
+
+bin2rss.exe: bin2rss.cpp
+ bcc -I$(INCPATH) /L$(LIBPATH) $(BCC_OPT) bin2rss.cpp

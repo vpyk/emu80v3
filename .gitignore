@@ -1,0 +1,16 @@
+*.bat
+*.cmd
+/!Ref
+/Distr
+/games
+/win32/*
+/linux/*
+/src/*.layout
+/src/*.depend
+/utils/Emu80Cfg/backup
+/utils/Emu80Cfg/lib
+/utils/Emu80Cfg/*.dbg
+/utils/Emu80Cfg/*.exe
+/utils/Emu80Cfg/*.lps
+/utils/Emu80Cfg/*.res
+/utils/Emu80Cfg/*.zip

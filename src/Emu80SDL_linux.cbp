@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Emu80SDL" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../linux/bin/Debug/Emu80SDL" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../games" />
+				<Option object_output="../linux/obj/Debug/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="../linux/bin/Release/Emu80SDL" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../linux/obj/Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Linker>
+			<Add option="`sdl-config --libs`" />
+		</Linker>
+		<Unit filename="Emu80SDL.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="asm.h" />
+		<Unit filename="dialogs.cpp" />
+		<Unit filename="emu80.h" />
+		<Unit filename="emu80.inc" />
+		<Unit filename="emucore.asm">
+			<Option compiler="gcc" use="1" buildCommand="nasm -f elf -Dlinux $file -o $object" />
+		</Unit>
+		<Unit filename="emucpu.asm">
+			<Option compiler="gcc" use="1" buildCommand="nasm -f elf -Dlinux $file -o $object" />
+		</Unit>
+		<Unit filename="emuinit.cpp" />
+		<Unit filename="emuinit.h" />
+		<Unit filename="emuio.asm">
+			<Option compiler="gcc" use="1" buildCommand="nasm -f elf -Dlinux $file -o $object" />
+		</Unit>
+		<Unit filename="emukeyb.asm">
+			<Option compiler="gcc" use="1" buildCommand="nasm -f elf -Dlinux $file -o $object" />
+		</Unit>
+		<Unit filename="emumisc.asm">
+			<Option compiler="gcc" use="1" buildCommand="nasm -f elf -Dlinux $file -o $object" />
+		</Unit>
+		<Unit filename="emurom.asm">
+			<Option compiler="gcc" use="1" buildCommand="nasm -f elf -Dlinux $file -o $object" />
+		</Unit>
+		<Unit filename="interf.asm">
+			<Option compiler="gcc" use="1" buildCommand="nasm -f elf -Dlinux $file -o $object" />
+		</Unit>
+		<Unit filename="io_vi53.cpp" />
+		<Unit filename="io_vi53.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="main.h" />
+		<Unit filename="menus.cpp" />
+		<Unit filename="menus.h" />
+		<Unit filename="misc.cpp" />
+		<Unit filename="misc.h" />
+		<Unit filename="rss.h" />
+		<Unit filename="scrdraw.cpp" />
+		<Unit filename="scrdraw.h" />
+		<Unit filename="sdllayer.cpp" />
+		<Unit filename="sdllayer.h" />
+		<Unit filename="sound.cpp" />
+		<Unit filename="sound.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

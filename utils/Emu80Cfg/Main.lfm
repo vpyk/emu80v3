@@ -1,0 +1,583 @@
+object MainForm: TMainForm
+  Left = 177
+  Height = 534
+  Top = 94
+  Width = 548
+  BorderStyle = bsDialog
+  Caption = 'Emu80 - Утилита конфигурирования v. 0.02 beta'
+  ClientHeight = 534
+  ClientWidth = 548
+  Color = clBtnFace
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnCreate = FormCreate
+  Position = poDefaultPosOnly
+  ShowHint = True
+  LCLVersion = '1.0.1.3'
+  object Bevel1: TBevel
+    Left = 420
+    Height = 437
+    Top = 0
+    Width = 1
+    Shape = bsLeftLine
+  end
+  object Label1: TLabel
+    Left = 8
+    Height = 14
+    Top = 496
+    Width = 121
+    Caption = 'Директория установки:'
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    ParentColor = False
+    ParentFont = False
+  end
+  object NameLabel: TLabel
+    Left = 84
+    Height = 13
+    Top = 516
+    Width = 373
+    AutoSize = False
+    Caption = 'NameLabel'
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object Panel1: TPanel
+    Left = 0
+    Height = 490
+    Top = 0
+    Width = 401
+    ClientHeight = 490
+    ClientWidth = 401
+    TabOrder = 0
+    object GroupBox1: TGroupBox
+      Left = 8
+      Height = 184
+      Top = 8
+      Width = 392
+      Caption = 'Настройки эмулятора'
+      ClientHeight = 166
+      ClientWidth = 388
+      TabOrder = 0
+      object VideoRadioGroup: TRadioGroup
+        Left = 6
+        Height = 93
+        Top = 0
+        Width = 185
+        AutoFill = True
+        Caption = 'Видеодрайвер'
+        ChildSizing.LeftRightSpacing = 6
+        ChildSizing.TopBottomSpacing = 6
+        ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+        ChildSizing.EnlargeVertical = crsHomogenousChildResize
+        ChildSizing.ShrinkHorizontal = crsScaleChilds
+        ChildSizing.ShrinkVertical = crsScaleChilds
+        ChildSizing.Layout = cclLeftToRightThenTopToBottom
+        ChildSizing.ControlsPerLine = 1
+        ClientHeight = 75
+        ClientWidth = 181
+        ItemIndex = 0
+        Items.Strings = (
+          'Автовыбор'
+          'DirectX (рекомендуется)'
+          'Windows GDI'
+        )
+        TabOrder = 0
+      end
+      object AudioRadioGroup: TRadioGroup
+        Left = 198
+        Height = 93
+        Top = 0
+        Width = 185
+        AutoFill = True
+        Caption = 'Аудиодрайвер'
+        ChildSizing.LeftRightSpacing = 6
+        ChildSizing.TopBottomSpacing = 6
+        ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+        ChildSizing.EnlargeVertical = crsHomogenousChildResize
+        ChildSizing.ShrinkHorizontal = crsScaleChilds
+        ChildSizing.ShrinkVertical = crsScaleChilds
+        ChildSizing.Layout = cclLeftToRightThenTopToBottom
+        ChildSizing.ControlsPerLine = 1
+        ClientHeight = 75
+        ClientWidth = 181
+        ItemIndex = 0
+        Items.Strings = (
+          'Автовыбор (рекомендуется)'
+          'Direct Sound'
+          'WaveOut'
+          'Без звука'
+        )
+        TabOrder = 1
+      end
+      object FullscreenRadioGroup: TRadioGroup
+        Left = 6
+        Height = 64
+        Top = 96
+        Width = 377
+        AutoFill = True
+        Caption = 'Стартовый режим'
+        ChildSizing.LeftRightSpacing = 6
+        ChildSizing.TopBottomSpacing = 6
+        ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+        ChildSizing.EnlargeVertical = crsHomogenousChildResize
+        ChildSizing.ShrinkHorizontal = crsScaleChilds
+        ChildSizing.ShrinkVertical = crsScaleChilds
+        ChildSizing.Layout = cclLeftToRightThenTopToBottom
+        ChildSizing.ControlsPerLine = 1
+        ClientHeight = 46
+        ClientWidth = 373
+        ItemIndex = 0
+        Items.Strings = (
+          'В окне'
+          'Полноэкранный'
+        )
+        TabOrder = 2
+      end
+    end
+    object GroupBox2: TGroupBox
+      Left = 8
+      Height = 261
+      Top = 192
+      Width = 392
+      Caption = 'Начальные настройки при запуске (можно поменять из меню)'
+      ClientHeight = 243
+      ClientWidth = 388
+      TabOrder = 1
+      object SpeedRadioGroup: TRadioGroup
+        Left = 162
+        Height = 82
+        Top = 152
+        Width = 221
+        AutoFill = True
+        Caption = 'Скорость эмуляции'
+        ChildSizing.LeftRightSpacing = 6
+        ChildSizing.TopBottomSpacing = 6
+        ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+        ChildSizing.EnlargeVertical = crsHomogenousChildResize
+        ChildSizing.ShrinkHorizontal = crsScaleChilds
+        ChildSizing.ShrinkVertical = crsScaleChilds
+        ChildSizing.Layout = cclLeftToRightThenTopToBottom
+        ChildSizing.ControlsPerLine = 1
+        ClientHeight = 64
+        ClientWidth = 217
+        ItemIndex = 0
+        Items.Strings = (
+          'Оригинальная (рекомендуется)'
+          'Без учета ПДП (повышенная)'
+          'Ускоренная'
+        )
+        TabOrder = 4
+      end
+      object TextRadioGroup: TRadioGroup
+        Left = 162
+        Height = 65
+        Top = 0
+        Width = 221
+        AutoFill = True
+        Caption = 'Текстовый режим'
+        ChildSizing.LeftRightSpacing = 6
+        ChildSizing.TopBottomSpacing = 6
+        ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+        ChildSizing.EnlargeVertical = crsHomogenousChildResize
+        ChildSizing.ShrinkHorizontal = crsScaleChilds
+        ChildSizing.ShrinkVertical = crsScaleChilds
+        ChildSizing.Layout = cclLeftToRightThenTopToBottom
+        ChildSizing.ControlsPerLine = 1
+        ClientHeight = 47
+        ClientWidth = 217
+        ItemIndex = 0
+        Items.Strings = (
+          'Улучшенный 8×16 (рекомендуется)'
+          'Оригинальный знакогенератор'
+        )
+        TabOrder = 1
+      end
+      object TapeRadioGroup: TRadioGroup
+        Left = 162
+        Height = 77
+        Top = 72
+        Width = 221
+        AutoFill = True
+        Caption = 'Эмуляция магнитофона'
+        ChildSizing.LeftRightSpacing = 6
+        ChildSizing.TopBottomSpacing = 6
+        ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+        ChildSizing.EnlargeVertical = crsHomogenousChildResize
+        ChildSizing.ShrinkHorizontal = crsScaleChilds
+        ChildSizing.ShrinkVertical = crsScaleChilds
+        ChildSizing.Layout = cclLeftToRightThenTopToBottom
+        ChildSizing.ControlsPerLine = 1
+        ClientHeight = 59
+        ClientWidth = 217
+        ItemIndex = 0
+        Items.Strings = (
+          'Перенаправление в файл'
+          'Вывод звука'
+          'Ввод с магнит. (пока недоступен)'
+        )
+        TabOrder = 2
+      end
+      object SoundRadioGroup: TRadioGroup
+        Left = 6
+        Height = 70
+        Top = 164
+        Width = 150
+        AutoFill = True
+        Caption = 'Звук'
+        ChildSizing.LeftRightSpacing = 6
+        ChildSizing.TopBottomSpacing = 6
+        ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+        ChildSizing.EnlargeVertical = crsHomogenousChildResize
+        ChildSizing.ShrinkHorizontal = crsScaleChilds
+        ChildSizing.ShrinkVertical = crsScaleChilds
+        ChildSizing.Layout = cclLeftToRightThenTopToBottom
+        ChildSizing.ControlsPerLine = 1
+        ClientHeight = 52
+        ClientWidth = 146
+        ItemIndex = 0
+        Items.Strings = (
+          'Вкл.'
+          'Выкл.'
+        )
+        TabOrder = 3
+      end
+      object ModelRadioGroup: TRadioGroup
+        Left = 6
+        Height = 160
+        Top = 0
+        Width = 149
+        AutoFill = True
+        Caption = 'Модель ПК'
+        ChildSizing.LeftRightSpacing = 6
+        ChildSizing.TopBottomSpacing = 6
+        ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+        ChildSizing.EnlargeVertical = crsHomogenousChildResize
+        ChildSizing.ShrinkHorizontal = crsScaleChilds
+        ChildSizing.ShrinkVertical = crsScaleChilds
+        ChildSizing.Layout = cclLeftToRightThenTopToBottom
+        ChildSizing.ControlsPerLine = 1
+        ClientHeight = 142
+        ClientWidth = 145
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        ItemIndex = 0
+        Items.Strings = (
+          'Радио-86РК'
+          'Партнёр'
+          'Микроша'
+          'Апогей'
+          'Специалист'
+          'Орион'
+          'ЮТ-88'
+          'Микро-80'
+        )
+        ParentFont = False
+        TabOrder = 0
+      end
+    end
+    object BitBtn1: TBitBtn
+      Left = 8
+      Height = 25
+      Hint = 'Сохранить настройки в обзем конфигурационном файле в директории эмулятора'
+      Top = 456
+      Width = 169
+      Caption = 'Сохранить emu80.cfg'
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      Glyph.Data = {
+        76010000424D7601000000000000760000002800000020000000100000000100
+        04000000000000010000130B0000130B00001000000000000000000000000000
+        800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+        FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333330070
+        7700333333337777777733333333008088003333333377F73377333333330088
+        88003333333377FFFF7733333333000000003FFFFFFF77777777000000000000
+        000077777777777777770FFFFFFF0FFFFFF07F3333337F3333370FFFFFFF0FFF
+        FFF07F3FF3FF7FFFFFF70F00F0080CCC9CC07F773773777777770FFFFFFFF039
+        99337F3FFFF3F7F777F30F0000F0F09999937F7777373777777F0FFFFFFFF999
+        99997F3FF3FFF77777770F00F000003999337F773777773777F30FFFF0FF0339
+        99337F3FF7F3733777F30F08F0F0337999337F7737F73F7777330FFFF0039999
+        93337FFFF7737777733300000033333333337777773333333333
+      }
+      NumGlyphs = 2
+      OnClick = BitBtn1Click
+      ParentFont = False
+      TabOrder = 2
+    end
+    object BitBtn2: TBitBtn
+      Left = 184
+      Height = 25
+      Hint = 'Сохранить настройки в выбранную директорию'
+      Top = 456
+      Width = 117
+      Caption = 'Сохранить в папку...'
+      NumGlyphs = 2
+      OnClick = BitBtn2Click
+      TabOrder = 3
+    end
+  end
+  object Panel2: TPanel
+    Left = 400
+    Height = 490
+    Top = 0
+    Width = 144
+    ClientHeight = 490
+    ClientWidth = 144
+    TabOrder = 1
+    object GroupBox3: TGroupBox
+      Left = -3
+      Height = 389
+      Top = 8
+      Width = 139
+      Caption = 'Ассоциации файлов'
+      ClientHeight = 371
+      ClientWidth = 135
+      TabOrder = 0
+      object RkCheckBox: TCheckBox
+        Left = 12
+        Height = 19
+        Hint = 'Файлы перенаправления'#13#10'с магнитофона (общ.)'
+        Top = 24
+        Width = 32
+        Caption = '.rk'
+        TabOrder = 0
+      end
+      object RkrCheckBox: TCheckBox
+        Left = 12
+        Height = 19
+        Hint = 'Файлы "Радио-86РК"'
+        Top = 44
+        Width = 35
+        Caption = '.rkr'
+        TabOrder = 1
+      end
+      object RkpCheckBox: TCheckBox
+        Left = 12
+        Height = 19
+        Hint = 'Файлы "Партнера"'
+        Top = 64
+        Width = 38
+        Caption = '.rkp'
+        TabOrder = 2
+      end
+      object RkmCheckBox: TCheckBox
+        Left = 12
+        Height = 19
+        Hint = 'Файлы "Микроши"'
+        Top = 84
+        Width = 40
+        Caption = '.rkm'
+        TabOrder = 3
+      end
+      object RkaCheckBox: TCheckBox
+        Left = 12
+        Height = 19
+        Hint = 'Файлы "Апогея"'
+        Top = 104
+        Width = 38
+        Caption = '.rka'
+        TabOrder = 4
+      end
+      object RksCheckBox: TCheckBox
+        Left = 12
+        Height = 19
+        Hint = 'Файлы "Специалиста"'
+        Top = 124
+        Width = 37
+        Caption = '.rks'
+        TabOrder = 5
+      end
+      object RkoCheckBox: TCheckBox
+        Left = 12
+        Height = 19
+        Hint = 'Файлы "Ориона"'
+        Top = 144
+        Width = 38
+        Caption = '.rko'
+        TabOrder = 6
+      end
+      object RkuCheckBox: TCheckBox
+        Left = 12
+        Height = 19
+        Hint = 'Файлы "ЮТ-88"'
+        Top = 164
+        Width = 38
+        Caption = '.rku'
+        TabOrder = 7
+      end
+      object Rk8CheckBox: TCheckBox
+        Left = 12
+        Height = 19
+        Hint = 'Файлы "Микро-80"'
+        Top = 184
+        Width = 38
+        Caption = '.rk8'
+        TabOrder = 8
+      end
+      object GamCheckBox: TCheckBox
+        Left = 12
+        Height = 19
+        Hint = 'Игровые программы для "Радио-86РК"'#13#10'(формат с синхробайтом)'
+        Top = 204
+        Width = 43
+        Caption = '.gam'
+        TabOrder = 9
+      end
+      object BruCheckBox: TCheckBox
+        Left = 12
+        Height = 19
+        Hint = 'Программы "Ориона" для "ОРДОС"'
+        Top = 224
+        Width = 38
+        Caption = '.bru'
+        TabOrder = 10
+      end
+      object OdiCheckBox: TCheckBox
+        Left = 12
+        Height = 19
+        Hint = 'Образы дисков "Ориона"'
+        Top = 244
+        Width = 37
+        Caption = '.odi'
+        TabOrder = 11
+      end
+      object RssCheckBox: TCheckBox
+        Left = 12
+        Height = 19
+        Hint = 'Файлы снапшотов'
+        Top = 264
+        Width = 36
+        Caption = '.rss'
+        TabOrder = 12
+      end
+      object BitBtn3: TBitBtn
+        Left = 8
+        Height = 25
+        Hint = 'Отметить все типы файлов для ассоциации с Emu80'
+        Top = 308
+        Width = 117
+        Caption = 'Отметить все'
+        Glyph.Data = {
+          76010000424D7601000000000000760000002800000020000000100000000100
+          04000000000000010000120B0000120B00001000000000000000000000000000
+          800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+          FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00555555555555
+          555555555555555555555555555555555555555555FF55555555555559055555
+          55555555577FF5555555555599905555555555557777F5555555555599905555
+          555555557777FF5555555559999905555555555777777F555555559999990555
+          5555557777777FF5555557990599905555555777757777F55555790555599055
+          55557775555777FF5555555555599905555555555557777F5555555555559905
+          555555555555777FF5555555555559905555555555555777FF55555555555579
+          05555555555555777FF5555555555557905555555555555777FF555555555555
+          5990555555555555577755555555555555555555555555555555
+        }
+        NumGlyphs = 2
+        OnClick = BitBtn3Click
+        TabOrder = 13
+      end
+      object BitBtn4: TBitBtn
+        Left = 8
+        Height = 25
+        Hint = 'Убрать отметку со всех типов файлов'
+        Top = 348
+        Width = 117
+        Caption = 'Убрать со всех'
+        Glyph.Data = {
+          DE010000424DDE01000000000000760000002800000024000000120000000100
+          0400000000006801000000000000000000001000000000000000000000000000
+          80000080000000808000800000008000800080800000C0C0C000808080000000
+          FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
+          333333333333333333333333000033338833333333333333333F333333333333
+          0000333911833333983333333388F333333F3333000033391118333911833333
+          38F38F333F88F33300003339111183911118333338F338F3F8338F3300003333
+          911118111118333338F3338F833338F3000033333911111111833333338F3338
+          3333F8330000333333911111183333333338F333333F83330000333333311111
+          8333333333338F3333383333000033333339111183333333333338F333833333
+          00003333339111118333333333333833338F3333000033333911181118333333
+          33338333338F333300003333911183911183333333383338F338F33300003333
+          9118333911183333338F33838F338F33000033333913333391113333338FF833
+          38F338F300003333333333333919333333388333338FFF830000333333333333
+          3333333333333333333888330000333333333333333333333333333333333333
+          0000
+        }
+        NumGlyphs = 2
+        OnClick = BitBtn4Click
+        TabOrder = 14
+      end
+    end
+    object BitBtn5: TBitBtn
+      Left = 8
+      Height = 25
+      Hint = 'Ассоциировать выбранные типы файлов с Emu80'
+      Top = 448
+      Width = 125
+      Caption = 'Ассоциировать!'
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      Glyph.Data = {
+        DE010000424DDE01000000000000760000002800000024000000120000000100
+        0400000000006801000000000000000000001000000000000000000000000000
+        80000080000000808000800000008000800080800000C0C0C000808080000000
+        FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
+        3333333333333333333333330000333333333333333333333333F33333333333
+        00003333344333333333333333388F3333333333000033334224333333333333
+        338338F3333333330000333422224333333333333833338F3333333300003342
+        222224333333333383333338F3333333000034222A22224333333338F338F333
+        8F33333300003222A3A2224333333338F3838F338F33333300003A2A333A2224
+        33333338F83338F338F33333000033A33333A222433333338333338F338F3333
+        0000333333333A222433333333333338F338F33300003333333333A222433333
+        333333338F338F33000033333333333A222433333333333338F338F300003333
+        33333333A222433333333333338F338F00003333333333333A22433333333333
+        3338F38F000033333333333333A223333333333333338F830000333333333333
+        333A333333333333333338330000333333333333333333333333333333333333
+        0000
+      }
+      NumGlyphs = 2
+      OnClick = BitBtn5Click
+      ParentFont = False
+      TabOrder = 1
+    end
+  end
+  object BitBtn6: TBitBtn
+    Left = 469
+    Height = 25
+    Hint = 'Выход из утилиты конфигурирования'
+    Top = 500
+    Width = 75
+    Caption = 'Закрыть'
+    Kind = bkClose
+    TabOrder = 2
+  end
+  object Button1: TButton
+    Left = 8
+    Height = 17
+    Top = 512
+    Width = 69
+    Caption = 'Выбрать...'
+    OnClick = Button1Click
+    TabOrder = 3
+  end
+  object SaveDialog: TSaveDialog
+    FileName = 'emu80.cfg'
+    Filter = 'Emu80 config|emu80.cfg'
+    left = 120
+    top = 296
+  end
+  object OpenDialog: TOpenDialog
+    FileName = 'Emu80SDL.exe'
+    Filter = 'Emu80 executable|Emu80SDL.exe'
+    left = 120
+    top = 232
+  end
+end
