@@ -7,6 +7,7 @@
 /linux/*
 /src/*.layout
 /src/*.depend
+/src/test
 /utils/Emu80Cfg/backup
 /utils/Emu80Cfg/lib
 /utils/Emu80Cfg/*.dbg

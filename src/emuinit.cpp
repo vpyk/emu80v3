@@ -17,7 +17,7 @@
  */
 
 // emuinit.cpp
-// 
+//
 
 #include <stdio.h>
 #include <string.h>
@@ -2005,13 +2005,31 @@ for(;;)
   {
   ClearTimer();
 
-  CheckKeys();
+// 43 FPS
+/*  CheckKeys();
   Emulate(1024);
   if (!ProcessQuery()) break;
   PrepareScreen();
   DrawScreen();
   nTime=GetTimer();
   if (nTime<23) Delay(23-nTime);
+*/
+
+// 65 FPS
+  CheckKeys();
+  Emulate(683);
+  if (!ProcessQuery()) break;
+  PrepareScreen();
+  DrawScreen();
+  nTime=GetTimer();
+  if (nTime<15) Delay(15-nTime);
+  CheckKeys();
+  Emulate(683);
+  if (!ProcessQuery()) break;
+  PrepareScreen();
+  DrawScreen();
+  nTime=GetTimer();
+  if (nTime<16) Delay(16-nTime);
 
   if (!bMute)
     { // Второй цикл - с ожиданием аудио
@@ -2066,4 +2084,9 @@ else if (res==1)
 //  Resume();
 //else
 //  Start();
+}
+
+void Emulate1(int nCycles)
+{
+
 }

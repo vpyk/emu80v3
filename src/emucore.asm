@@ -570,21 +570,19 @@ Reset:
         mov word [reg_sp],ax
         mov ax,word [reset_addr]
         mov word [reg_pc],ax
+;        call store_regs
         ; Обнуление счетчика тактов
         mov word [tick_count],0
         call perform_reset
         ret
 
-Emulate:
+InterpretOp:
         push ebp
         mov ebp,esp
-        mov eax, dword[ebp+8]
-        mov word [cnt_44100],ax
         call restore_regs
-        mov ebp,0
 
 ; Начало основного цикла
-interpret:
+cont_interpret:
         ; Проверяем, не попали ли в Монитор
         cmp si,word [rom_adr]
         jb inter2
@@ -614,6 +612,29 @@ i_pag:  movzx ebx,byte [ebx+esi]
         jnz ip2
         ; Вызываем обработчик команды
         call ebp
+
+        call store_regs
+        movzx eax,bp
+        pop ebp
+        ret
+ip2:    call store_regs
+        mov eax,10
+        pop ebp
+        ret
+
+Emulate:
+        push ebp
+        mov ebp,esp
+        mov eax, dword[ebp+8]
+        mov word [cnt_44100],ax
+;        call restore_regs
+        mov ebp,0
+
+interpret:
+        call InterpretOp
+        mov ebp,eax
+
+
         ; Восстанавливаем адрес текущей страницы памяти
         push ebx
      ;mov ebx, dword [mem_mem]
@@ -625,8 +646,6 @@ ip21:
         sub bp,word [delay_sb]
         jae inter3
         jmp interpret ; к следующей команде
-ip2:    mov bp,10   ;!!!
-        jmp ip21
 
 ; сюда управление попадает каждые 1/44100 с
 inter3: mov word [tick_count],bp
@@ -651,8 +670,7 @@ inter4:
 inter5: dec word [cnt_44100]
         jnz interpret
 
-inter6: call store_regs
-        pop ebp
+inter6: pop ebp
         ret
 
 ; сюда управление попадает 50 раз в секунду
@@ -773,7 +791,7 @@ _f80c:
         jne inter2
         call emF80C
         call emu_ret
-        jmp interpret
+        jmp cont_interpret
 
 _f80c_s:
         cmp byte [f_tape],TAPE_FILE
@@ -783,14 +801,14 @@ _f80c_s:
         call emF80C
         pop cx
         call emu_ret
-        jmp interpret
+        jmp cont_interpret
 
 _f806:
         cmp byte [f_tape],TAPE_FILE
         jne inter2
         call emF806
         call emu_ret
-        jmp interpret
+        jmp cont_interpret
 
 _f803:
         call close_file ; Если работали с файлом, то его закрыть

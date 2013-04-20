@@ -42,77 +42,6 @@ cextern use_io_space
 
 [section .data]
 
-; Таблица входов в подпрограммы обработки инструкций 8080
-code_tbl:
-  dd c00,c01,c02,c03,c04,c05,c06,c07
-  dd c08,c09,c0A,c0B,c0C,c0D,c0E,c0F
-  dd c10,c11,c12,c13,c14,c15,c16,c17
-  dd c18,c19,c1A,c1B,c1C,c1D,c1E,c1F
-  dd c20,c21,c22,c23,c24,c25,c26,c27
-  dd c28,c29,c2A,c2B,c2C,c2D,c2E,c2F
-  dd c30,c31,c32,c33,c34,c35,c36,c37
-  dd c38,c39,c3A,c3B,c3C,c3D,c3E,c3F
-  dd c40,c41,c42,c43,c44,c45,c46,c47
-  dd c48,c49,c4A,c4B,c4C,c4D,c4E,c4F
-  dd c50,c51,c52,c53,c54,c55,c56,c57
-  dd c58,c59,c5A,c5B,c5C,c5D,c5E,c5F
-  dd c60,c61,c62,c63,c64,c65,c66,c67
-  dd c68,c69,c6A,c6B,c6C,c6D,c6E,c6F
-  dd c70,c71,c72,c73,c74,c75,c76,c77
-  dd c78,c79,c7A,c7B,c7C,c7D,c7E,c7F
-  dd c80,c81,c82,c83,c84,c85,c86,c87
-  dd c88,c89,c8A,c8B,c8C,c8D,c8E,c8F
-  dd c90,c91,c92,c93,c94,c95,c96,c97
-  dd c98,c99,c9A,c9B,c9C,c9D,c9E,c9F
-  dd cA0,cA1,cA2,cA3,cA4,cA5,cA6,cA7
-  dd cA8,cA9,cAA,cAB,cAC,cAD,cAE,cAF
-  dd cB0,cB1,cB2,cB3,cB4,cB5,cB6,cB7
-  dd cB8,cB9,cBA,cBB,cBC,cBD,cBE,cBF
-  dd cC0,cC1,cC2,cC3,cC4,cC5,cC6,cC7
-  dd cC8,cC9,cCA,cCB,cCC,cCD,cCE,cCF
-  dd cD0,cD1,cD2,cD3,cD4,cD5,cD6,cD7
-  dd cD8,cD9,cDA,cDB,cDC,cDD,cDE,cDF
-  dd cE0,cE1,cE2,cE3,cE4,cE5,cE6,cE7
-  dd cE8,cE9,cEA,cEB,cEC,cED,cEE,cEF
-  dd cF0,cF1,cF2,cF3,cF4,cF5,cF6,cF7
-  dd cF8,cF9,cFA,cFB,cFC,cFD,cFE,cFF
-
-; Таблица входов в подпрограммы обработки инструкций 8080 в
-; режиме эмуляции видео-ОЗУ
-code_tbl_m:
-  dd c00,c01,d02,c03,c04,c05,c06,c07
-  dd c08,c09,c0A,c0B,c0C,c0D,c0E,c0F
-  dd c10,c11,d12,c13,c14,c15,c16,c17
-  dd c18,c19,c1A,c1B,c1C,c1D,c1E,c1F
-  dd c20,c21,d22,c23,c24,c25,c26,c27
-  dd c28,c29,c2A,c2B,c2C,c2D,c2E,c2F
-  dd c30,c31,d32,c33,d34,d35,d36,c37
-  dd c38,c39,c3A,c3B,c3C,c3D,c3E,c3F
-  dd c40,c41,c42,c43,c44,c45,c46,c47
-  dd c48,c49,c4A,c4B,c4C,c4D,c4E,c4F
-  dd c50,c51,c52,c53,c54,c55,c56,c57
-  dd c58,c59,c5A,c5B,c5C,c5D,c5E,c5F
-  dd c60,c61,c62,c63,c64,c65,c66,c67
-  dd c68,c69,c6A,c6B,c6C,c6D,c6E,c6F
-  dd d70,d71,d72,d73,d74,d75,c76,d77
-  dd c78,c79,c7A,c7B,c7C,c7D,c7E,c7F
-  dd c80,c81,c82,c83,c84,c85,c86,c87
-  dd c88,c89,c8A,c8B,c8C,c8D,c8E,c8F
-  dd c90,c91,c92,c93,c94,c95,c96,c97
-  dd c98,c99,c9A,c9B,c9C,c9D,c9E,c9F
-  dd cA0,cA1,cA2,cA3,cA4,cA5,cA6,cA7
-  dd cA8,cA9,cAA,cAB,cAC,cAD,cAE,cAF
-  dd cB0,cB1,cB2,cB3,cB4,cB5,cB6,cB7
-  dd cB8,cB9,cBA,cBB,cBC,cBD,cBE,cBF
-  dd cC0,cC1,cC2,cC3,dC4,dC5,cC6,dC7
-  dd cC8,cC9,cCA,cCB,dCC,dCD,cCE,dCF
-  dd cD0,cD1,cD2,dD3,dD4,dD5,cD6,dD7
-  dd cD8,cD9,cDA,cDB,dDC,dDD,cDE,dDF
-  dd cE0,cE1,cE2,cE3,dE4,dE5,cE6,dE7
-  dd cE8,cE9,cEA,cEB,d0EC,dED,cEE,dEF
-  dd cF0,cF1,cF2,cF3,dF4,dF5,cF6,dF7
-  dd cF8,cF9,cFA,cFB,dFC,dFD,cFE,dFF
-
 ; Таблица входов в подпрограммы обработки инструкций 8080 в
 ; режиме эмуляции видео-ОЗУ и портов клавиатуры
 code_tbl_m2:
@@ -155,7 +84,7 @@ save_f db 0
 
 ; Реализация подпрограмм, соответствующих инструкциям 8080
 ; Соответствие регистров:
-; 
+;
 ;  A - AL
 ; BC - CX
 ; DE - DX
@@ -1895,7 +1824,7 @@ cF3:;di
         pop ax
         mov bp,4
         ret
-cFB:;ei    
+cFB:;ei
         inc si
         push ax
         call enable_ints
