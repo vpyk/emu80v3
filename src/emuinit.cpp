@@ -42,6 +42,8 @@
 #include "sound.h"
 #include "io_vi53.h"
 
+void Emulate(int nSamples); //!!!
+
 void DebugProc(int arg)
 {
 printf("%d\n",arg);
@@ -2006,31 +2008,30 @@ for(;;)
   ClearTimer();
 
 // 43 FPS
-/*  CheckKeys();
+  CheckKeys();
   Emulate(1024);
   if (!ProcessQuery()) break;
   PrepareScreen();
   DrawScreen();
   nTime=GetTimer();
   if (nTime<23) Delay(23-nTime);
-*/
 
 // 65 FPS
-  CheckKeys();
-  Emulate(683);
+/*  CheckKeys();
+  Emulate1(683);
   if (!ProcessQuery()) break;
   PrepareScreen();
   DrawScreen();
   nTime=GetTimer();
   if (nTime<15) Delay(15-nTime);
   CheckKeys();
-  Emulate(683);
+  Emulate1(683);
   if (!ProcessQuery()) break;
   PrepareScreen();
   DrawScreen();
   nTime=GetTimer();
   if (nTime<16) Delay(16-nTime);
-
+*/
   if (!bMute)
     { // Второй цикл - с ожиданием аудио
     CheckKeys();
@@ -2086,7 +2087,42 @@ else if (res==1)
 //  Start();
 }
 
-void Emulate1(int nCycles)
-{
+//-------------------------------------------------------------
 
+static int nVretrCnt=0;
+static int nCnt20ms=882;
+
+void ProcessSample()
+{
+    if (nVretrCnt)
+        nVretrCnt--;
+    vretr_cnt=nVretrCnt;
+    ProcessTime(ticks_per_44100th);
+    nCnt20ms--;
+    if (!nCnt20ms)
+    {
+        nCnt20ms=882;
+        nVretrCnt=28;
+        process_int();
+    }
+    PlayByteNoWait(GetSample());
+}
+
+void Emulate(int nSamples)
+{
+    //static unsigned long long qwTickCount=0;
+
+    int nTicks;
+    int nTickCnt=0;
+    for(int i=0;nSamples?i<nSamples:!bWaitSnd;i++)
+    {
+        nTicks=InterpretOp();
+        //qwTickCount+=nTicks;
+        nTickCnt+=nTicks;
+        if (nTickCnt>delay_sb)
+        {
+            nTickCnt-=delay_sb;
+            ProcessSample();
+        }
+    }
 }

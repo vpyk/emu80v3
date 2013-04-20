@@ -40,7 +40,7 @@ cglobal hook_o_sb
 cglobal hook_m80_sb
 cglobal hook_u_sb
 cglobal Reset
-cglobal Emulate
+cglobal InterpretOp
 cglobal ProcessQuery
 cglobal PrepareScreen
 cglobal Init
@@ -83,6 +83,9 @@ cglobal AfterLoadRom
 [global f_chscr]
 [global f_use8x12]
 [global f_pause]
+
+[global store_regs]
+[global restore_regs]
 
 cextern f_speed               ;byte
 cextern f_scr                 ;byte
@@ -160,7 +163,7 @@ cextern bWaitSnd              ;!!!word
 ;[extern com_path]              ;byte
 ;[extern com_path_len]          ;word
 ;[extern light_led]             ;near
-[extern process_int]           ;near
+cextern process_int           ;near
 ;[extern disable_ints]          ;near
 [extern sysreq_code]           ;byte
 ;[extern GeneralError]          ;near
@@ -174,7 +177,7 @@ cextern bWaitSnd              ;!!!word
 ;[extern wSBPort]               ;word
 ;[extern wSBDMA]                ;word
 [extern calc_pit]              ;near
-[extern vretr_cnt]             ;byte
+cextern vretr_cnt             ;byte
 [extern translate_sysreq_code] ;near
 [extern ticks_per_calc]        ;!!!word
 [extern perform_reset]         ;near
@@ -254,8 +257,6 @@ c_table resd 1
 
 f806_adr resw 1 ; Адрес процедуры чтения байта с магнитофона
 f80c_adr resw 1 ; Адрес процедуры записи байта на магнитофон
-
-hook_proc resd 1 ;!!! Адрес процедуры перехвата
 
 hook_proc_sb  resd 1 ;!!! Адрес процедуры перехвата - Sound Blaster
 
@@ -475,8 +476,6 @@ anal_params:
         push eax
         ;call ResetDSP ; !!!
         ;mov dword [interpret_proc], interpret
-        mov eax, dword [hook_proc_sb]
-        mov dword [hook_proc],eax
         mov ax, word [ticks_per_44100th]
         mov word [ticks_per_calc],ax
 ap10:   cmp byte [f_speed],SPEED_HIGH
@@ -620,57 +619,6 @@ i_pag:  movzx ebx,byte [ebx+esi]
 ip2:    call store_regs
         mov eax,10
         pop ebp
-        ret
-
-Emulate:
-        push ebp
-        mov ebp,esp
-        mov eax, dword[ebp+8]
-        mov word [cnt_44100],ax
-;        call restore_regs
-        mov ebp,0
-
-interpret:
-        call InterpretOp
-        mov ebp,eax
-
-
-        ; Восстанавливаем адрес текущей страницы памяти
-        push ebx
-     ;mov ebx, dword [mem_mem]
-     ;mov dword [mem],ebx
-        pop ebx
-ip21:
-        add bp,word [tick_count]
-        mov word [tick_count],bp
-        sub bp,word [delay_sb]
-        jae inter3
-        jmp interpret ; к следующей команде
-
-; сюда управление попадает каждые 1/44100 с
-inter3: mov word [tick_count],bp
-        call calc_pit
-
-        dec word [cnt_20ms]
-        jnz inter4
-
-        ; сюда управление попадает 50 раз в секунду
-        mov word [cnt_20ms],882
-        mov byte [vretr_cnt],28
-        call process_int
-
-inter4:
-         cmp word [cnt_44100],0
-        jnz inter5
-
-        cmp byte [bWaitSnd],0
-        jnz inter6
-        jmp interpret
-
-inter5: dec word [cnt_44100]
-        jnz interpret
-
-inter6: pop ebp
         ret
 
 ; сюда управление попадает 50 раз в секунду

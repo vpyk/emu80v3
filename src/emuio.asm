@@ -61,7 +61,7 @@ cglobal snd_state
 [global load_byte]
 [global save_port]
 [global load_port]
-[global process_int]
+cglobal process_int
 [global write_byte_spec]
 [global write_byte_spec_640]
 [global write_byte_spec_800]
@@ -71,7 +71,7 @@ cglobal snd_state
 [global cur_color_code]
 [global calc_pit]
 [global ticks_per_calc]
-[global vretr_cnt]
+cglobal vretr_cnt
 [global old_or_colormode]
 [global old_or_scrpage]
 [global perform_reset]
@@ -123,6 +123,9 @@ cextern GetSample     ; dword
 ;[extern snd61_and]     ; byte
 [extern mem]           ; dword
 [extern set_cursor_pos]; near
+
+[extern store_regs]
+[extern restore_regs]
 
 
 ;- DATA ----------------------------------------------------------------------
@@ -246,6 +249,7 @@ enable_ints:
         jne ei1
         cmp byte [int_req],0
         jz ei1
+        call store_regs
         call process_int
 ;       mov byte ptr cs:[int_flag],1
 ei1:    ret
@@ -261,6 +265,7 @@ disable_ints:
 process_int:
         cmp byte [cModel],MODEL_P ; Нужно ли?
         jne pi1 ; Работает только для "Партнера"
+       call restore_regs
        cmp byte [int_flag],0
        jnz pi2
        mov byte [int_req],1
@@ -273,6 +278,7 @@ pi2:   mov byte [int_flag],0
        je pi3
        dec si
 pi3:   call rst6
+       call store_regs
        pop ebp
 pi1:   ret
 ;process_int endp

@@ -42,7 +42,7 @@ extern "C" unsigned char *sym_gen;       // знакогенератор
 extern "C" char color_table[4];        // таблица соответствия цветов
 extern "C" char or_color4_table[4];
 extern "C" void Reset();
-extern "C" void Emulate(int nCycles);
+extern "C" int InterpretOp();
 extern "C" int ProcessQuery();
 extern "C" int PrepareScreen();
 extern "C" void Init();                // иниц-ия при смене типа ПК
@@ -92,6 +92,8 @@ extern "C" void corr_key_tbl();        // настраивает таблицы клав. под модель
 extern "C" void set_new_09_vect();       //
 extern "C" void restore_09_vect();       //
 extern "C" void AfterLoadRom();       //
+
+extern "C" void process_int();       //
 
 extern "C" unsigned short sh_scrbeg;   // начало экранной области
 extern "C" unsigned char sh_height;    // количество строк
@@ -146,5 +148,7 @@ extern "C" unsigned short reg_de;      // регистр DE
 extern "C" unsigned short reg_hl;      // регистр HL
 extern "C" unsigned short reg_sp;      // регистр SP
 extern "C" unsigned short reg_pc;      // регистр PC
+
+extern "C" unsigned char vretr_cnt;
 
 #endif
