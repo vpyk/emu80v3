@@ -2112,9 +2112,10 @@ void Emulate(int nSamples)
 {
     //static unsigned long long qwTickCount=0;
 
+    static int nTickCnt=0;
     int nTicks;
-    int nTickCnt=0;
-    for(int i=0;nSamples?i<nSamples:!bWaitSnd;i++)
+    int i=0;
+    while(nSamples?i<nSamples:!bWaitSnd)
     {
         nTicks=InterpretOp();
         //qwTickCount+=nTicks;
@@ -2123,6 +2124,7 @@ void Emulate(int nSamples)
         {
             nTickCnt-=delay_sb;
             ProcessSample();
+            i++;
         }
     }
 }
