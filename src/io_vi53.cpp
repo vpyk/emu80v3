@@ -59,7 +59,7 @@ void Timer8253::InitPIT()
         wPITCounter[i]=0;
         wPITInitCnt[i]=0;
         wPITLatch[i]=0;
-        bPITMode[i]=3;
+        bPITMode[i]=0;//3;
         bPITState[i]=stStopped;
         bPITLoadMode[i]=rlLatch;
         bPITRState[i]=rwstWaitLow;
@@ -68,14 +68,14 @@ void Timer8253::InitPIT()
         bPITCountBCD[i]=0;
         bPITOutput[i]=1;
     }
-    bPITCSW[0]=0x36;
-    bPITCSW[1]=0x76;
-    bPITCSW[2]=0xB6;
-    if (cModel==MODEL_R) //!!!
+    bPITCSW[0]=0x10;//0x36;
+    bPITCSW[1]=0x50;//0x76;
+    bPITCSW[2]=0x90;//0xB6;
+/*    if (cModel==MODEL_R) //!!!
     {
         bPITCSW[2]=0xB0;
         bPITMode[2]=0;
-    }
+    }*/
 }
 
 void Timer8253::WritePITReg(Uint16 wReg, Uint8 bValue)
@@ -151,8 +151,8 @@ Uint8 Timer8253::ReadPITReg(Uint16 wReg)
 {
     wReg&=0x03;
     if (wReg==3)
-        return bPITWState[2];
-//        return 0xFF;
+//        return bPITWState[2];
+        return 0xFF;
     if (bPITRState[wReg]==rwstWaitLow)
     {
         bPITRState[wReg]=rwstWaitHigh;
@@ -187,7 +187,8 @@ void Timer8253::ProcessTime(long lTicks)
             {
                 if (wPITCounter[2]<nPulses[1])
                 {
-                    wPITCounter[i]=0;
+                    //wPITCounter[i]=0;
+                    wPITCounter[i]-=(Uint16)nPulses[1];
                     bPITOutput[i]=1;
                     nPulses[i]=0;
                 }
@@ -199,7 +200,8 @@ void Timer8253::ProcessTime(long lTicks)
             case 0:
                 if (wPITCounter[i]<lTicks)
                 {
-                    wPITCounter[i]=0;
+                    //wPITCounter[i]=0;
+                    wPITCounter[i]-=(Uint16)lTicks;
                     bPITOutput[i]=1;
                     bPITState[i]=stStopped;
                     nPulses[i]=0;
@@ -220,8 +222,17 @@ void Timer8253::ProcessTime(long lTicks)
                     wPITCounter[i]=(Uint16)((int)wPITCounter[i]-lTicksCnt);
                 bPITOutput[i]=wPITCounter[i]<wPITInitCnt[i]/2?0:1;
                 break;
-
+            default:
+              wPITCounter[i]-=(Uint16)lTicks;
             }
+        }
+        else
+        {
+            if (cModel==MODEL_R && i==2) //!!!
+                wPITCounter[i]-=(Uint16)nPulses[1];
+            else
+              wPITCounter[i]-=(Uint16)lTicks;
+
         }
     }
     if (cModel==MODEL_P) //!!!
