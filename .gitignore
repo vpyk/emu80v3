@@ -2,6 +2,7 @@
 *.cmd
 /!Ref
 /Distr
+/build
 /games
 /win32/*
 /linux/*
