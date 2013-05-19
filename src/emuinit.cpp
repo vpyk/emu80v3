@@ -1752,7 +1752,7 @@ static char *ppcHelp[19]={" Горячие клавиши в режиме эмуляции: ",
                          "  Alt-A ...... О программе  ",
                          };
 
-static char *ppcAbout[2]={"   Emu80/SDL  v. 3.11 alpha",
+static char *ppcAbout[2]={"   Emu80/SDL  v. 3.12 test 1",
                           "(c) 1997-2013 Victor Pykhonin",
                           };
 
