@@ -18,10 +18,12 @@
 
 // io_vi53.h
 
-#ifndef IO_VI53_H_INCLUDED
-#define IO_VI53_H_INCLUDED
+#ifndef _IO_VI53_H
+#define _IO_VI53_H
 
 #include "rss.h"
+
+#include "io_device.h"
 
 // bPITCountBCD values
 enum TPITBCD
@@ -53,52 +55,53 @@ enum TPITCntRWState
     rwstWaitHigh=0
 };
 
-class Timer8253 {
+class Timer8253 : public TIODevice
+{
 public:
     Timer8253();
     void StartCount(int nCnt);
-    void InitPIT();
-    void WritePITReg(Uint16 wReg, Uint8 bValue);
-    Uint8 ReadPITReg(Uint16 wReg);
-    void ProcessTime(long lTicks);
-    Uint8 GetOutput(Uint8 bCnt);
-    Uint8 GetSample();
+    void InitDevice();
+    void WriteReg(uint16_t wReg, uint8_t bValue);
+    uint8_t ReadReg(uint16_t wReg);
+    void ProcessTime(int nTicks);
+    uint8_t GetOutput(uint8_t bCnt);
+    uint8_t GetSample();
     void LoadPITState(RKSS_PIT_STATE *pitState);
     void SavePITState(RKSS_PIT_STATE *pitState);
 private:
-    Uint16 wPITCounter[3];   // Текущие значения счетчиков
-    Uint16 wPITInitCnt[3];   // Начальное значение счетчика (для режима 3)
-    Uint16 wPITLatch[3];     // Защелкиваемое значение счетчика
-    Uint8 bPITState[3];      // Состояние счетчиков (stStopped, stWorking)
-    Uint8 bPITRState[3];     // Чтение старшего или младшего байта
-    Uint8 bPITWState[3];     // Запись старшего или младшего байта
-    Uint8 bPITCntLatched[3]; // Защелкнут ли счетчик
-    Uint8 bPITMode[3];       // Режим работы счетчиков (0-5)
-    Uint8 bPITOutput[3];     // Состояние выходов счетчиков (0-1)
-    Uint8 bPITLoadMode[3];   // Режим загрузки счетчиков
-    Uint8 bPITCountBCD[3];   // BCD-режим счета
-    Uint8 bPITCSW[3];
-    unsigned short wPitK0;
-    unsigned short wPitK1;
-    unsigned short wPitK2;
-    unsigned short wPitCnt2;
-    unsigned short wPitCnt0;
-    unsigned short wPitCnt1;
-    unsigned char cPitMode0;
-    unsigned char cPitMode1;
-    unsigned char cPitMode2;
-    unsigned char cPitLd0;
-    unsigned char cPitLd1;
-    unsigned char cPitLd2;
+    uint16_t wPITCounter[3];   // Текущие значения счетчиков
+    uint16_t wPITInitCnt[3];   // Начальное значение счетчика (для режима 3)
+    uint16_t wPITLatch[3];     // Защелкиваемое значение счетчика
+    uint8_t bPITState[3];      // Состояние счетчиков (stStopped, stWorking)
+    uint8_t bPITRState[3];     // Чтение старшего или младшего байта
+    uint8_t bPITWState[3];     // Запись старшего или младшего байта
+    uint8_t bPITCntLatched[3]; // Защелкнут ли счетчик
+    uint8_t bPITMode[3];       // Режим работы счетчиков (0-5)
+    uint8_t bPITOutput[3];     // Состояние выходов счетчиков (0-1)
+    uint8_t bPITLoadMode[3];   // Режим загрузки счетчиков
+    uint8_t bPITCountBCD[3];   // BCD-режим счета
+    uint8_t bPITCSW[3];
+    uint16_t wPitK0;
+    uint16_t wPitK1;
+    uint16_t wPitK2;
+    uint16_t wPitCnt2;
+    uint16_t wPitCnt0;
+    uint16_t wPitCnt1;
+    uint8_t cPitMode0;
+    uint8_t cPitMode1;
+    uint8_t cPitMode2;
+    uint8_t cPitLd0;
+    uint8_t cPitLd1;
+    uint8_t cPitLd2;
 };
 
 extern "C" void InitPIT();
-extern "C" void WritePITReg(Uint16 wReg, Uint8 bValue);
-extern "C" Uint8 ReadPITReg(Uint16 wReg);
+extern "C" void WritePITReg(uint16_t wReg, uint8_t bValue);
+extern "C" uint8_t ReadPITReg(uint16_t wReg);
 extern "C" void ProcessTime(long lTicks);
-extern "C" Uint8 GetOutput(Uint8 bCnt);
-extern "C" Uint8 GetSample();
+extern "C" uint8_t GetOutput(uint8_t bCnt);
+extern "C" uint8_t GetSample();
 void LoadPITState(RKSS_PIT_STATE *pitState);
 void SavePITState(RKSS_PIT_STATE *pitState);
 
-#endif // IO_VI53_H_INCLUDED
+#endif // _IO_VI53_H

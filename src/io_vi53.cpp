@@ -20,21 +20,23 @@
 
 // Реализация интервального таймера КР580ВИ53
 
-#include "sdllayer.h"
+#include <stdint.h>
+#include <stdlib.h>
+//#include "sdllayer.h"
 #include "emu80.h"
 #include "asm.h"
 #include "emuinit.h"
 #include "io_vi53.h"
 
-const Uint8 bOneChLevel=0x1F;
+const uint8_t bOneChLevel=0x1F;
 
-Uint16 wPartnerCnt=0;
-const Uint8 wPartnerInitCnt=28;
-Uint8 bPartnerOutput=0;
+uint16_t wPartnerCnt=0;
+const uint8_t wPartnerInitCnt=28;
+uint8_t bPartnerOutput=0;
 
 Timer8253::Timer8253()
 {
-    InitPIT();
+    InitDevice();
 }
 
 void Timer8253::StartCount(int nCnt)
@@ -52,7 +54,7 @@ void Timer8253::StartCount(int nCnt)
     return;
 }
 
-void Timer8253::InitPIT()
+void Timer8253::InitDevice()
 {
     for(int i=0;i<3;i++)
     {
@@ -78,15 +80,15 @@ void Timer8253::InitPIT()
     }*/
 }
 
-void Timer8253::WritePITReg(Uint16 wReg, Uint8 bValue)
+void Timer8253::WriteReg(uint16_t wReg, uint8_t bValue)
 {
     wReg&=0x3;
     if (wReg==0x03) // CSW
     {
         int nCnt=(bValue&0xc0)>>6;
         if (nCnt==3) return;
-        Uint8 bLoadMode=(bValue&0x30)>>4;
-        Uint8 bMode=(bValue&0x0E)>>1;
+        uint8_t bLoadMode=(bValue&0x30)>>4;
+        uint8_t bMode=(bValue&0x0E)>>1;
         if (bMode==7) bMode=3;
         if (bLoadMode==rlLatch) // команда защелкивания
         {
@@ -147,7 +149,7 @@ void Timer8253::WritePITReg(Uint16 wReg, Uint8 bValue)
     }
 }
 
-Uint8 Timer8253::ReadPITReg(Uint16 wReg)
+uint8_t Timer8253::ReadReg(uint16_t wReg)
 {
     wReg&=0x03;
     if (wReg==3)
@@ -174,10 +176,10 @@ Uint8 Timer8253::ReadPITReg(Uint16 wReg)
     }
 }
 
-void Timer8253::ProcessTime(long lTicks)
+void Timer8253::ProcessTime(int nTicks)
 {
     int nPulses[3]; // Количество переходов через 0
-    int lTicksCnt;
+    int nTicksCnt;
 
     for(int i=0;i<3;i++)
     {
@@ -188,7 +190,7 @@ void Timer8253::ProcessTime(long lTicks)
                 if (wPITCounter[2]<nPulses[1])
                 {
                     //wPITCounter[i]=0;
-                    wPITCounter[i]-=(Uint16)nPulses[1];
+                    wPITCounter[i]-=(uint16_t)nPulses[1];
                     bPITOutput[i]=1;
                     nPulses[i]=0;
                 }
@@ -198,62 +200,62 @@ void Timer8253::ProcessTime(long lTicks)
             else switch (bPITMode[i])
             {
             case 0:
-                if (wPITCounter[i]<lTicks)
+                if (wPITCounter[i]<nTicks)
                 {
                     //wPITCounter[i]=0;
-                    wPITCounter[i]-=(Uint16)lTicks;
+                    wPITCounter[i]-=(uint16_t)nTicks;
                     bPITOutput[i]=1;
                     bPITState[i]=stStopped;
                     nPulses[i]=0;
                 }
                 else
-                   wPITCounter[i]=wPITCounter[i]-lTicks;
+                   wPITCounter[i]=wPITCounter[i]-nTicks;
                 break;
             case 3:
                 nPulses[i]=0;
                 if (wPITInitCnt[i]!=0)
-                    nPulses[i]=(wPITInitCnt[i]+lTicks-wPITCounter[i])/wPITInitCnt[i];
+                    nPulses[i]=(wPITInitCnt[i]+nTicks-wPITCounter[i])/wPITInitCnt[i];
                 if (wPITInitCnt[i]<3)  // ультразвук не воспроизводим ;)
                     break;
-                lTicksCnt=lTicks % (long)wPITInitCnt[i];
-                if ((int)wPITCounter[i]<lTicksCnt)
-                    wPITCounter[i]=(Uint16)((int)wPITCounter[i]+(int)wPITInitCnt[i]-lTicksCnt);
+                nTicksCnt=nTicks % (long)wPITInitCnt[i];
+                if ((int)wPITCounter[i]<nTicksCnt)
+                    wPITCounter[i]=(uint16_t)((int)wPITCounter[i]+(int)wPITInitCnt[i]-nTicksCnt);
                 else
-                    wPITCounter[i]=(Uint16)((int)wPITCounter[i]-lTicksCnt);
+                    wPITCounter[i]=(uint16_t)((int)wPITCounter[i]-nTicksCnt);
                 bPITOutput[i]=wPITCounter[i]<wPITInitCnt[i]/2?0:1;
                 break;
             default:
-              wPITCounter[i]-=(Uint16)lTicks;
+              wPITCounter[i]-=(uint16_t)nTicks;
             }
         }
         else
         {
             if (cModel==MODEL_R && i==2) //!!!
-                wPITCounter[i]-=(Uint16)nPulses[1];
+                wPITCounter[i]-=(uint16_t)nPulses[1];
             else
-              wPITCounter[i]-=(Uint16)lTicks;
+              wPITCounter[i]-=(uint16_t)nTicks;
 
         }
     }
     if (cModel==MODEL_P) //!!!
     {
-        lTicksCnt=lTicks%wPartnerInitCnt;
-        if ((int)wPartnerCnt<lTicksCnt)
-            wPartnerCnt=(Uint16)((int)wPartnerCnt+(int)wPartnerInitCnt-lTicksCnt);
+        nTicksCnt=nTicks%wPartnerInitCnt;
+        if ((int)wPartnerCnt<nTicksCnt)
+            wPartnerCnt=(uint16_t)((int)wPartnerCnt+(int)wPartnerInitCnt-nTicksCnt);
         else
-            wPartnerCnt=(Uint16)((int)wPartnerCnt-lTicksCnt);
+            wPartnerCnt=(uint16_t)((int)wPartnerCnt-nTicksCnt);
         bPartnerOutput=wPartnerCnt<((long)wPartnerInitCnt*2/5)?0:1; //
     }
 }
 
-Uint8 Timer8253::GetOutput(Uint8 bCnt)
+uint8_t Timer8253::GetOutput(uint8_t bCnt)
 {
     return bPITOutput[bCnt];
 }
 
-Uint8 Timer8253::GetSample()
+uint8_t Timer8253::GetSample()
 {
-    Uint8 bRes=0;
+    uint8_t bRes=0;
     switch (cModel) //!!!
     {
     case MODEL_A:
@@ -348,7 +350,7 @@ void InitPIT()
 {
     if (!PTimer)
         PTimer = new Timer8253;
-    PTimer->InitPIT();
+    PTimer->InitDevice();
 }
 
 void StartCount(int nCnt)
@@ -356,14 +358,14 @@ void StartCount(int nCnt)
     PTimer->StartCount(nCnt);
 }
 
-void WritePITReg(Uint16 wReg, Uint8 bValue)
+void WritePITReg(uint16_t wReg, uint8_t bValue)
 {
-    PTimer->WritePITReg(wReg, bValue);
+    PTimer->WriteReg(wReg, bValue);
 }
 
-Uint8 ReadPITReg(Uint16 wReg)
+uint8_t ReadPITReg(uint16_t wReg)
 {
-    return PTimer->ReadPITReg(wReg);
+    return PTimer->ReadReg(wReg);
 }
 
 void ProcessTime(long lTicks)
@@ -371,9 +373,9 @@ void ProcessTime(long lTicks)
     PTimer->ProcessTime(lTicks);
 }
 
-//Uint8 Timer8253.GetOutput(Uint8 bCnt)
+//uint8_t Timer8253.GetOutput(uint8_t bCnt)
 
-Uint8 GetSample()
+uint8_t GetSample()
 {
     return PTimer->GetSample();
 }

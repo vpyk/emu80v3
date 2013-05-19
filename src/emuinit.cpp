@@ -23,11 +23,11 @@
 #include <string.h>
 //#include <mem.h>
 
-#ifdef linux
+#ifdef win32
+#include <io.h>
+#else
 #include <dirent.h>
 #include <sys/stat.h>
-#else
-#include <io.h>
 #endif
 
 #include <stdlib.h>
@@ -1673,8 +1673,7 @@ else if (!strncasecmp(s,"model=",6))
   }
 else if (!strncasecmp(s,"videodriver=",12))
   {
-#ifdef linux
-#else
+#ifdef win32
   if (!strcasecmp(s+12,"directx"))
     szVideoDriver="directx";
   else if (!strcasecmp(s+12,"windib"))
@@ -1685,19 +1684,19 @@ else if (!strncasecmp(s,"videodriver=",12))
   }
 else if (!strncasecmp(s,"audiodriver=",12))
   {
-#ifdef linux
-  if (!strcasecmp(s+12,"alsa"))
-    szAudioDriver="alsa";
-#else
+#ifdef win32
   if (!strcasecmp(s+12,"dsound"))
     szAudioDriver="dsound";
+#else
+  if (!strcasecmp(s+12,"alsa"))
+    szAudioDriver="alsa";
 #endif
 //  else if (!strcasecmp(s+12,"waveout"))
 //    szAudioDriver="waveout";
   else if (!strcasecmp(s+12,"none"))
     bMute=1;
-//  else if (!strcasecmp(s+12,"auto"))
-//    szAudioDriver="";
+  else if (!strcasecmp(s+12,"auto"))
+    szAudioDriver="";
   }
 else if (!strncasecmp(s,"fullscreen=",11))
   {
@@ -1844,7 +1843,61 @@ if (res) return res;
  return strcasecmp(szStr1, szStr2);
 }
 
-#ifdef linux
+#ifdef win32
+
+void ChooseFile()
+{
+char *szFileName=(char *)&filename;
+szFileName[0]='\0';
+_finddata_t fd;
+int nMaxFiles=0;
+long hFile=_findfirst("*",&fd);
+if (hFile==-1)
+  return;
+if (!(fd.attrib & (_A_HIDDEN | _A_SYSTEM | _A_VOLID | _A_SUBDIR)))
+  nMaxFiles++;
+while(_findnext(hFile,&fd)==0)
+  if (!(fd.attrib & (_A_HIDDEN | _A_SYSTEM | _A_VOLID | _A_SUBDIR)))
+    nMaxFiles++;
+_findclose(hFile);
+char ** pszFiles;
+pszFiles = new char*[nMaxFiles];
+
+int nFiles=0;
+hFile=_findfirst("*",&fd);
+if (hFile==-1)
+  {
+  delete[] pszFiles;
+  return;
+  }
+if (!(fd.attrib & (_A_HIDDEN | _A_SYSTEM | _A_VOLID | _A_SUBDIR)))
+  {
+  pszFiles[nFiles]=new char[strlen(fd.name)+1];
+  strcpy(pszFiles[nFiles],fd.name);
+  nFiles++;
+  }
+while(_findnext(hFile,&fd)==0 && nFiles<=nMaxFiles)
+  if (!(fd.attrib & (_A_HIDDEN | _A_SYSTEM | _A_VOLID | _A_SUBDIR)))
+    {
+    pszFiles[nFiles]=new char[strlen(fd.name)+1];
+    strcpy(pszFiles[nFiles],fd.name);
+    nFiles++;
+    }
+_findclose(hFile);
+
+qsort((void *)pszFiles, nFiles, sizeof(char *),fnFileNameCompare);
+
+int res=ShowMessage(pszFiles,nFiles," Выбор файла ",1,0,1,70,25,fnGetColor);
+
+if (res!=-1 && strlen(pszFiles[res])<=255)
+  strcpy(szFileName, pszFiles[res]);
+
+for (int i=0;i<nFiles;i++)
+  delete[] pszFiles[i];
+delete[] pszFiles;
+}
+
+#else
 
 void ChooseFile()
 {
@@ -1908,60 +1961,6 @@ void ChooseFile()
     }
     if (pszFiles)
         delete[] pszFiles;
-}
-
-#else
-
-void ChooseFile()
-{
-char *szFileName=(char *)&filename;
-szFileName[0]='\0';
-_finddata_t fd;
-int nMaxFiles=0;
-long hFile=_findfirst("*",&fd);
-if (hFile==-1)
-  return;
-if (!(fd.attrib & (_A_HIDDEN | _A_SYSTEM | _A_VOLID | _A_SUBDIR)))
-  nMaxFiles++;
-while(_findnext(hFile,&fd)==0)
-  if (!(fd.attrib & (_A_HIDDEN | _A_SYSTEM | _A_VOLID | _A_SUBDIR)))
-    nMaxFiles++;
-_findclose(hFile);
-char ** pszFiles;
-pszFiles = new char*[nMaxFiles];
-
-int nFiles=0;
-hFile=_findfirst("*",&fd);
-if (hFile==-1)
-  {
-  delete[] pszFiles;
-  return;
-  }
-if (!(fd.attrib & (_A_HIDDEN | _A_SYSTEM | _A_VOLID | _A_SUBDIR)))
-  {
-  pszFiles[nFiles]=new char[strlen(fd.name)+1];
-  strcpy(pszFiles[nFiles],fd.name);
-  nFiles++;
-  }
-while(_findnext(hFile,&fd)==0 && nFiles<=nMaxFiles)
-  if (!(fd.attrib & (_A_HIDDEN | _A_SYSTEM | _A_VOLID | _A_SUBDIR)))
-    {
-    pszFiles[nFiles]=new char[strlen(fd.name)+1];
-    strcpy(pszFiles[nFiles],fd.name);
-    nFiles++;
-    }
-_findclose(hFile);
-
-qsort((void *)pszFiles, nFiles, sizeof(char *),fnFileNameCompare);
-
-int res=ShowMessage(pszFiles,nFiles," Выбор файла ",1,0,1,70,25,fnGetColor);
-
-if (res!=-1 && strlen(pszFiles[res])<=255)
-  strcpy(szFileName, pszFiles[res]);
-
-for (int i=0;i<nFiles;i++)
-  delete[] pszFiles[i];
-delete[] pszFiles;
 }
 
 #endif

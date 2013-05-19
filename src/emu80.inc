@@ -112,23 +112,22 @@ VM_GRAPH800 equ 4
      add esp,ebx
 %endmacro
 
-%macro cglobal 1 
-%ifdef linux
+%macro cglobal 1
+%ifdef win32
+          global _%1
+%define %1 _%1
+%else
           global %1
-%else
-          global _%1 
-%define %1 _%1 
 %endif
 %endmacro
 
-%macro cextern 1 
-%ifdef linux
+%macro cextern 1
+%ifdef win32
+          extern _%1
+%define %1 _%1
+%else
           extern %1
-%else
-          extern _%1 
-%define %1 _%1 
 %endif
 
 %endmacro
 
-	

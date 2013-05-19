@@ -284,9 +284,9 @@ while(SDL_PollEvent(&event))
     {
     cScanCode=event.key.keysym.scancode;
 #ifdef linux
+      // в новой версии SDL бит 7 установлен?
       cScanCode-=0x80;
 #endif
-    // в новой версии SDL бит 7 установлен?
     ProcessKeyboard(event.type==SDL_KEYDOWN?cScanCode&0x7f:cScanCode|0x80);
     }
 /*  else if (event.type==SDL_ACTIVEEVENT)

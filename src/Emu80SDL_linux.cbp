@@ -40,30 +40,34 @@
 		<Unit filename="emu80.h" />
 		<Unit filename="emu80.inc" />
 		<Unit filename="emucore.asm">
-			<Option compiler="gcc" use="1" buildCommand="nasm -f elf -Dlinux $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="nasm -f elf $file -o $object" />
 		</Unit>
 		<Unit filename="emucpu.asm">
-			<Option compiler="gcc" use="1" buildCommand="nasm -f elf -Dlinux $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="nasm -f elf $file -o $object" />
 		</Unit>
 		<Unit filename="emuinit.cpp" />
 		<Unit filename="emuinit.h" />
 		<Unit filename="emuio.asm">
-			<Option compiler="gcc" use="1" buildCommand="nasm -f elf -Dlinux $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="nasm -f elf $file -o $object" />
 		</Unit>
 		<Unit filename="emukeyb.asm">
-			<Option compiler="gcc" use="1" buildCommand="nasm -f elf -Dlinux $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="nasm -f elf $file -o $object" />
 		</Unit>
 		<Unit filename="emumisc.asm">
-			<Option compiler="gcc" use="1" buildCommand="nasm -f elf -Dlinux $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="nasm -f elf $file -o $object" />
 		</Unit>
 		<Unit filename="emurom.asm">
-			<Option compiler="gcc" use="1" buildCommand="nasm -f elf -Dlinux $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="nasm -f elf $file -o $object" />
 		</Unit>
 		<Unit filename="interf.asm">
-			<Option compiler="gcc" use="1" buildCommand="nasm -f elf -Dlinux $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="nasm -f elf $file -o $object" />
 		</Unit>
+		<Unit filename="io_device.cpp" />
+		<Unit filename="io_device.h" />
 		<Unit filename="io_vi53.cpp" />
 		<Unit filename="io_vi53.h" />
+		<Unit filename="io_vv55.cpp" />
+		<Unit filename="io_vv55.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="main.h" />
 		<Unit filename="menus.cpp" />
