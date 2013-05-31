@@ -1,4 +1,4 @@
-// Intel 8080 (KR580VM80A) microprocessor core model
+// Intel 8080 (KR580VM80A) microprocessor core object model
 //
 // Copyright (C) 2012 Alexander Demin <alexander@demin.ws>
 // Portions Copyright (C) 2013 Viktor Pykhonin <pyk@mail.ru>
@@ -42,39 +42,6 @@
 
 #define WR_BYTE(addr, value) i8080_hal_memory_write_byte(addr, value)
 #define WR_WORD(addr, value) i8080_hal_memory_write_word(addr, value)
-
-typedef unsigned char           uns8;
-typedef unsigned short          uns16;
-typedef unsigned long int       uns32;
-typedef signed char             sgn8;
-typedef signed short            sgn16;
-typedef signed long int         sgn32;
-
-typedef union {
-    struct {
-        uns8 l, h;
-    } b;
-    uns16 w;
-} reg_pair;
-
-typedef struct {
-    uns8 carry_flag;
-    uns8 unused1;
-    uns8 parity_flag;
-    uns8 unused3;
-    uns8 half_carry_flag;
-    uns8 unused5;
-    uns8 zero_flag;
-    uns8 sign_flag;
-} flag_reg;
-
-struct i8080 {
-    flag_reg f;
-    reg_pair af, bc, de, hl;
-    reg_pair sp, pc;
-    uns16 iff;
-    uns16 last_pc;
-};
 
 #define FLAGS           cpu.f
 #define AF              cpu.af.w
@@ -266,37 +233,8 @@ struct i8080 {
 
 // TCPU8080 Implementation
 
-static struct i8080 cpu;
 
-static uns32 work32;
-static uns16 work16;
-static uns8 work8;
-static int index;
-static uns8 carry, add;
-
-int parity_table[] = {
-    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
-    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-};
-
-int half_carry_table[] = { 0, 0, 1, 0, 1, 0, 1, 1 };
-int sub_half_carry_table[] = { 0, 1, 1, 1, 0, 0, 0, 1 };
-
-void i8080_init(void) {
+void TCPU8080::i8080_init(void) {
     C_FLAG = 0;
     S_FLAG = 0;
     Z_FLAG = 0;
@@ -309,7 +247,8 @@ void i8080_init(void) {
     PC = 0xF800;
 }
 
-static void i8080_store_flags(void) {
+// private
+void TCPU8080::i8080_store_flags(void) {
     if (S_FLAG) F |= F_NEG;      else F &= ~F_NEG;
     if (Z_FLAG) F |= F_ZERO;     else F &= ~F_ZERO;
     if (H_FLAG) F |= F_HCARRY;   else F &= ~F_HCARRY;
@@ -320,7 +259,8 @@ static void i8080_store_flags(void) {
     F &= ~F_UN5;   // UN5_FLAG is always 0.
 }
 
-static void i8080_retrieve_flags(void) {
+//private
+void TCPU8080::i8080_retrieve_flags(void) {
     S_FLAG = F & F_NEG      ? 1 : 0;
     Z_FLAG = F & F_ZERO     ? 1 : 0;
     H_FLAG = F & F_HCARRY   ? 1 : 0;
@@ -328,7 +268,8 @@ static void i8080_retrieve_flags(void) {
     C_FLAG = F & F_CARRY    ? 1 : 0;
 }
 
-static int i8080_execute(int opcode) {
+//private
+int TCPU8080::i8080_execute(int opcode) {
     int cpu_cycles;
     switch (opcode) {
         case 0x00:            /* nop */
@@ -1714,58 +1655,58 @@ static int i8080_execute(int opcode) {
     return cpu_cycles;
 }
 
-int i8080_instruction(void) {
+int TCPU8080::i8080_instruction(void) {
     return i8080_execute(RD_BYTE(PC++));
 }
 
-void i8080_jump(int addr) {
+void TCPU8080::i8080_jump(int addr) {
     PC = addr & 0xffff;
 }
 
-int i8080_pc(void) {
+int TCPU8080::i8080_pc(void) {
     return PC;
 }
 
-int i8080_regs_bc(void) {
+int TCPU8080::i8080_regs_bc(void) {
     return BC;
 }
 
-int i8080_regs_de(void) {
+int TCPU8080::i8080_regs_de(void) {
     return DE;
 }
 
-int i8080_regs_hl(void) {
+int TCPU8080::i8080_regs_hl(void) {
     return HL;
 }
 
-int i8080_regs_sp(void) {
+int TCPU8080::i8080_regs_sp(void) {
     return SP;
 }
 
-int i8080_regs_a(void) {
+int TCPU8080::i8080_regs_a(void) {
     return A;
 }
 
-int i8080_regs_b(void) {
+int TCPU8080::i8080_regs_b(void) {
     return B;
 }
 
-int i8080_regs_c(void) {
+int TCPU8080::i8080_regs_c(void) {
     return C;
 }
 
-int i8080_regs_d(void) {
+int TCPU8080::i8080_regs_d(void) {
     return D;
 }
 
-int i8080_regs_e(void) {
+int TCPU8080::i8080_regs_e(void) {
     return E;
 }
 
-int i8080_regs_h(void) {
+int TCPU8080::i8080_regs_h(void) {
     return H;
 }
 
-int i8080_regs_l(void) {
+int TCPU8080::i8080_regs_l(void) {
     return L;
 }

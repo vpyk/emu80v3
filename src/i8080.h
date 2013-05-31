@@ -37,6 +37,54 @@
 
 #include <stdint.h>
 
+typedef union {
+    struct {
+        uint8_t l, h;
+    } b;
+    uint16_t w;
+} reg_pair;
+
+typedef struct {
+    uint8_t carry_flag;
+    uint8_t unused1;
+    uint8_t parity_flag;
+    uint8_t unused3;
+    uint8_t half_carry_flag;
+    uint8_t unused5;
+    uint8_t zero_flag;
+    uint8_t sign_flag;
+} flag_reg;
+
+struct i8080 {
+    flag_reg f;
+    reg_pair af, bc, de, hl;
+    reg_pair sp, pc;
+    uint16_t iff;
+    uint16_t last_pc;
+};
+
+const int parity_table[] = {
+    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+    0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+    1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
+};
+
+const int half_carry_table[] = { 0, 0, 1, 0, 1, 0, 1, 1 };
+const int sub_half_carry_table[] = { 0, 1, 1, 1, 0, 0, 0, 1 };
+
 class TCPU8080// : public TCPU
 {
 public:
@@ -44,6 +92,7 @@ public:
     int i8080_instruction();
 
     void i8080_jump(uint16_t addr);
+
     uint16_t i8080_pc();
 
     uint16_t i8080_regs_bc();
@@ -58,6 +107,19 @@ public:
     uint16_t i8080_regs_e();
     uint16_t i8080_regs_h();
     uint16_t i8080_regs_l();
+
+private:
+    struct i8080 cpu;
+
+    uint32_t work32;
+    uint16_t work16;
+    uint8_t work8;
+    int index;
+    uint8_t carry, add;
+
+    void i8080_store_flags();
+    void i8080_retrieve_flags();
+    int i8080_execute(int opcode);
 }
 
 #endif

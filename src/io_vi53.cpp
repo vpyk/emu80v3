@@ -191,7 +191,7 @@ void Timer8253::ProcessTime(int nTicks)
     {
         if (bPITState[i]==stWorking)
         {
-            if (cModel==MODEL_R && i==2) //!!!
+            if (ptType==ptRK86 && i==2) //!!!
             {
                 if (wPITCounter[2]<nPulses[1])
                 {
@@ -236,14 +236,14 @@ void Timer8253::ProcessTime(int nTicks)
         }
         else
         {
-            if (cModel==MODEL_R && i==2) //!!!
+            if (ptType==ptRK86 && i==2) //!!!
                 wPITCounter[i]-=(uint16_t)nPulses[1];
             else
               wPITCounter[i]-=(uint16_t)nTicks;
 
         }
     }
-    if (cModel==MODEL_P) //!!!
+    if (cModel==MODEL_P) //!!! Вынести в TPlatform
     {
         nTicksCnt=nTicks%wPartnerInitCnt;
         if ((int)wPartnerCnt<nTicksCnt)
@@ -259,7 +259,7 @@ uint8_t Timer8253::GetOutput(uint8_t bCnt)
     return bPITOutput[bCnt];
 }
 
-uint8_t Timer8253::GetSample()
+uint8_t Timer8253::GetSample() //!!! Вынести в TPlatform
 {
     uint8_t bRes=0;
     switch (cModel) //!!!
