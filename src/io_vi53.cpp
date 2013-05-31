@@ -34,9 +34,15 @@ uint16_t wPartnerCnt=0;
 const uint8_t wPartnerInitCnt=28;
 uint8_t bPartnerOutput=0;
 
-Timer8253::Timer8253()
+Timer8253::Timer8253(TPITType ptPITType)
 {
     InitDevice();
+    ptType=ptPITType;
+}
+
+void Timer8253::SetPITType(TPITType ptPITType)
+{
+    ptType=ptPITType;
 }
 
 void Timer8253::StartCount(int nCnt)
@@ -349,8 +355,12 @@ static class Timer8253 *PTimer = NULL;
 void InitPIT()
 {
     if (!PTimer)
-        PTimer = new Timer8253;
-    PTimer->InitDevice();
+        PTimer = new Timer8253(cModel!=MODEL_R?ptGeneral:ptRK86);
+    else
+    {
+        PTimer->InitDevice();
+        PTimer->SetPITType(cModel!=MODEL_R?ptGeneral:ptRK86);
+    }
 }
 
 void StartCount(int nCnt)

@@ -55,10 +55,16 @@ enum TPITCntRWState
     rwstWaitHigh=0
 };
 
+enum TPITType
+{
+    ptGeneral=0,
+    ptRK86=1
+};
+
 class Timer8253 : public TIODevice
 {
 public:
-    Timer8253();
+    Timer8253(TPITType pkPITType=ptGeneral);
     void StartCount(int nCnt);
     void InitDevice();
     void WriteReg(uint16_t wReg, uint8_t bValue);
@@ -66,6 +72,7 @@ public:
     void ProcessTime(int nTicks);
     uint8_t GetOutput(uint8_t bCnt);
     uint8_t GetSample();
+    void SetPITType(TPITType ptPITType=ptGeneral);
     void LoadPITState(RKSS_PIT_STATE *pitState);
     void SavePITState(RKSS_PIT_STATE *pitState);
 private:
@@ -93,6 +100,7 @@ private:
     uint8_t cPitLd0;
     uint8_t cPitLd1;
     uint8_t cPitLd2;
+    TPITType ptType;
 };
 
 extern "C" void InitPIT();
