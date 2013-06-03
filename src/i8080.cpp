@@ -113,7 +113,7 @@
 
 #define ADD(val) \
 {                                               \
-    work16 = (uns16)A + (val);                  \
+    work16 = (uint16_t)A + (val);                  \
     index = ((A & 0x88) >> 1) |                 \
             (((val) & 0x88) >> 2) |             \
             ((work16 & 0x88) >> 3);             \
@@ -127,7 +127,7 @@
 
 #define ADC(val) \
 {                                               \
-    work16 = (uns16)A + (val) + C_FLAG;         \
+    work16 = (uint16_t)A + (val) + C_FLAG;         \
     index = ((A & 0x88) >> 1) |                 \
             (((val) & 0x88) >> 2) |             \
             ((work16 & 0x88) >> 3);             \
@@ -141,7 +141,7 @@
 
 #define SUB(val) \
 {                                                \
-    work16 = (uns16)A - (val);                   \
+    work16 = (uint16_t)A - (val);                   \
     index = ((A & 0x88) >> 1) |                  \
             (((val) & 0x88) >> 2) |              \
             ((work16 & 0x88) >> 3);              \
@@ -155,7 +155,7 @@
 
 #define SBB(val) \
 {                                                \
-    work16 = (uns16)A - (val) - C_FLAG;          \
+    work16 = (uint16_t)A - (val) - C_FLAG;          \
     index = ((A & 0x88) >> 1) |                  \
             (((val) & 0x88) >> 2) |              \
             ((work16 & 0x88) >> 3);              \
@@ -169,7 +169,7 @@
 
 #define CMP(val) \
 {                                                \
-    work16 = (uns16)A - (val);                   \
+    work16 = (uint16_t)A - (val);                   \
     index = ((A & 0x88) >> 1) |                  \
             (((val) & 0x88) >> 2) |              \
             ((work16 & 0x88) >> 3);              \
@@ -212,7 +212,7 @@
 
 #define DAD(reg) \
 {                                               \
-    work32 = (uns32)HL + (reg);                 \
+    work32 = (uint32_t)HL + (reg);                 \
     HL = work32 & 0xffff;                       \
     C_FLAG = ((work32 & 0x10000L) != 0);        \
 }
@@ -390,7 +390,7 @@ int TCPU8080::i8080_execute(int opcode) {
 
         case 0x17:            /* ral */
             cpu_cycles = 4;
-            work8 = (uns8)C_FLAG;
+            work8 = (uint8_t)C_FLAG;
             C_FLAG = ((A & 0x80) != 0);
             A = (A << 1) | work8;
             break;
@@ -427,7 +427,7 @@ int TCPU8080::i8080_execute(int opcode) {
 
         case 0x1F:             /* rar */
             cpu_cycles = 4;
-            work8 = (uns8)C_FLAG;
+            work8 = (uint8_t)C_FLAG;
             C_FLAG = A & 0x01;
             A = (A >> 1) | (work8 << 7);
             break;
@@ -466,7 +466,7 @@ int TCPU8080::i8080_execute(int opcode) {
 
         case 0x27:            /* daa */
             cpu_cycles = 4;
-            carry = (uns8)C_FLAG;
+            carry = (uint8_t)C_FLAG;
             add = 0;
             if (H_FLAG || (A & 0x0f) > 9) {
                 add = 0x06;

@@ -14,7 +14,7 @@
 // Ian Bartholomew, 8080/8085 CPU Exerciser
 // http://www.idb.me.uk/sunhillow/8080.html
 //
-// Frank Cringle, The origianal exerciser for the Z80.
+// Frank Cringle, The original exerciser for the Z80.
 //
 // Thanks to zx.pk.ru and nedopc.org/forum communities.
 //
@@ -91,22 +91,22 @@ public:
     void i8080_init();
     int i8080_instruction();
 
-    void i8080_jump(uint16_t addr);
+    void i8080_jump(int addr);
 
-    uint16_t i8080_pc();
+    int i8080_pc();
 
-    uint16_t i8080_regs_bc();
-    uint16_t i8080_regs_de();
-    uint16_t i8080_regs_hl();
-    uint16_t i8080_regs_sp();
+    int i8080_regs_bc();
+    int i8080_regs_de();
+    int i8080_regs_hl();
+    int i8080_regs_sp();
 
-    uint16_t i8080_regs_a();
-    uint16_t i8080_regs_b();
-    uint16_t i8080_regs_c();
-    uint16_t i8080_regs_d();
-    uint16_t i8080_regs_e();
-    uint16_t i8080_regs_h();
-    uint16_t i8080_regs_l();
+    int i8080_regs_a();
+    int i8080_regs_b();
+    int i8080_regs_c();
+    int i8080_regs_d();
+    int i8080_regs_e();
+    int i8080_regs_h();
+    int i8080_regs_l();
 
 private:
     struct i8080 cpu;
@@ -120,6 +120,6 @@ private:
     void i8080_store_flags();
     void i8080_retrieve_flags();
     int i8080_execute(int opcode);
-}
+};
 
 #endif

@@ -57,6 +57,13 @@ cglobal use_io_space
 
 cglobal snd_state
 
+cglobal EnableInts
+cglobal DisableInts
+cglobal SaveByte
+cglobal LoadByte
+cglobal SavePort
+cglobal LoadPort
+
 [global save_byte]
 [global load_byte]
 [global save_port]
@@ -241,6 +248,37 @@ temp_byte resb 1 ; Временная ячейка
 
 ;- TEXT ----------------------------------------------------------------------
 [segment .text]
+
+EnableInts:
+    ret
+
+DisableInts:
+    ret
+
+LoadByte:
+    push ebp
+    mov ebp,esp
+    mov ebp, dword[ebp+8]
+    call load_byte
+    movzx eax,ah
+    pop ebp
+    ret
+
+SaveByte:
+    push ebp
+    mov ebp,esp
+    mov eax, dword[ebp+12]
+    mov ah,al
+    mov ebp, dword[ebp+8]
+    call save_byte
+    pop ebp
+    ret
+
+LoadPort:
+    ret
+
+SavePort:
+    ret
 
 ; Разрешение прерываний (EI)
 enable_ints:

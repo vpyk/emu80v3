@@ -51,6 +51,11 @@ extern "C" void Init();                // иниц-ия при смене типа ПК
 extern "C" void SetDefParams();        // устанавливает параметры по умолчанию
 extern "C" void FlushKeys();
 
+extern "C" void EnableInts();
+extern "C" void DisableInts();
+extern "C" int LoadByte(int nAddr);
+extern "C" void SaveByte(int nAddr, int nValue);
+
 extern "C" MENU_LINE f_speed;
 extern "C" MENU_LINE f_scr;
 extern "C" MENU_LINE f_snd;
