@@ -59,6 +59,10 @@
 		<Unit filename="emurom.asm">
 			<Option compiler="gcc" use="1" buildCommand="nasm -f elf $file -o $object" />
 		</Unit>
+		<Unit filename="i8080.cpp" />
+		<Unit filename="i8080.h" />
+		<Unit filename="i8080_hal.cpp" />
+		<Unit filename="i8080_hal.h" />
 		<Unit filename="interf.asm">
 			<Option compiler="gcc" use="1" buildCommand="nasm -f elf $file -o $object" />
 		</Unit>

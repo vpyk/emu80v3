@@ -26,6 +26,8 @@ SET (emu80_SOURCES
   scrdraw.cpp
   sdllayer.cpp
   sound.cpp
+  i8080.cpp
+  i8080_hal.cpp
   emucore.asm
   emucpu.asm
   emuio.asm
