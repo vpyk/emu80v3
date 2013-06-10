@@ -93,12 +93,14 @@ public:
 
     void i8080_jump(int addr);
 
-    int i8080_pc();
+    int get_pc();
 
-    int i8080_regs_bc();
-    int i8080_regs_de();
-    int i8080_regs_hl();
-    int i8080_regs_sp();
+    int get_bc();
+    int get_de();
+    int get_hl();
+    int get_sp();
+
+    int get_af();
 
     int i8080_regs_a();
     int i8080_regs_b();
@@ -107,6 +109,13 @@ public:
     int i8080_regs_e();
     int i8080_regs_h();
     int i8080_regs_l();
+
+    void set_bc(int value);
+    void set_de(int value);
+    void set_hl(int value);
+    void set_sp(int value);
+    void set_pc(int value);
+    void set_af(int value);
 
 private:
     struct i8080 cpu;

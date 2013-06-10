@@ -1663,23 +1663,23 @@ void TCPU8080::i8080_jump(int addr) {
     PC = addr & 0xffff;
 }
 
-int TCPU8080::i8080_pc(void) {
+int TCPU8080::get_pc(void) {
     return PC;
 }
 
-int TCPU8080::i8080_regs_bc(void) {
+int TCPU8080::get_bc(void) {
     return BC;
 }
 
-int TCPU8080::i8080_regs_de(void) {
+int TCPU8080::get_de(void) {
     return DE;
 }
 
-int TCPU8080::i8080_regs_hl(void) {
+int TCPU8080::get_hl(void) {
     return HL;
 }
 
-int TCPU8080::i8080_regs_sp(void) {
+int TCPU8080::get_sp(void) {
     return SP;
 }
 
@@ -1710,3 +1710,40 @@ int TCPU8080::i8080_regs_h(void) {
 int TCPU8080::i8080_regs_l(void) {
     return L;
 }
+
+int TCPU8080::get_af(void) {
+    i8080_store_flags();
+    return AF;
+}
+
+void TCPU8080::set_bc(int value)
+{
+    BC = value;
+}
+
+void TCPU8080::set_de(int value)
+{
+    DE = value;
+}
+
+void TCPU8080::set_hl(int value)
+{
+    HL = value;
+}
+
+void TCPU8080::set_sp(int value)
+{
+    SP = value;
+}
+
+void TCPU8080::set_pc(int value)
+{
+    PC = value;
+}
+
+void TCPU8080::set_af(int value)
+{
+    AF = value;
+    i8080_retrieve_flags();
+}
+

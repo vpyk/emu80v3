@@ -23,12 +23,16 @@
 #ifndef _MISC_H
 #define _MISC_H
 
+#include "i8080.h"
+
 extern "C" void * SaveScr();
 extern "C" void RestScr(void * pBuf);
 
 void SetExePath(char *szPath);
 FILE * exepath_fopen(const char *szName, const char *szMode);
 unsigned char TranslateScanCode(unsigned char ucScanCode);
+
+extern TCPU8080 *PCPU;
 
 extern "C" void CloseTapeFile();
 extern "C" void CloseTapeFileDelay();

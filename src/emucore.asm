@@ -40,7 +40,7 @@ cglobal hook_o_sb
 cglobal hook_m80_sb
 cglobal hook_u_sb
 cglobal Reset
-cglobal InterpretOp
+;cglobal InterpretOp
 cglobal ProcessQuery
 cglobal PrepareScreen
 cglobal Init

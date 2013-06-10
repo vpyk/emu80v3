@@ -35,6 +35,8 @@ using namespace std;
 static int nExePathLen;
 static string strExePath;
 
+TCPU8080 *PCPU;
+
 void SetExePath(char *szPath)
 {
 strExePath=szPath;
@@ -106,6 +108,9 @@ fclose(f);
 
 //wSBPort=0x220;
 //wSBDMA=1;
+
+PCPU = new TCPU8080; //!!!
+PCPU->i8080_init();               //!!!
 }
 
 // Очистка памяти сегмента 8080

@@ -42,7 +42,7 @@ extern "C" unsigned char *sym_gen;       // знакогенератор
 extern "C" char color_table[4];        // таблица соответствия цветов
 extern "C" char or_color4_table[4];
 extern "C" void Reset();
-extern "C" int InterpretOp();
+//extern "C" int InterpretOp();
 extern "C" int ProcessQuery();
 extern "C" int PrepareScreen();
 extern "C" void Init();                // иниц-ия при смене типа ПК

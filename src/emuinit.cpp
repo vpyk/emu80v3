@@ -2107,6 +2107,34 @@ void ProcessSample()
     PlayByteNoWait(GetSample());
 }
 
+int InterpretOp()
+{
+    int nTicks;
+    if (reg_pc>rom_adr)
+    {
+        // hooks_here
+    }
+    // workaround Orion mempages here
+
+    PCPU->set_bc(reg_bc);
+    PCPU->set_de(reg_de);
+    PCPU->set_hl(reg_hl);
+    PCPU->set_sp(reg_sp);
+    PCPU->set_pc(reg_pc);
+    PCPU->set_af(reg_af);
+
+    nTicks=PCPU->i8080_instruction();
+
+    reg_bc=PCPU->get_bc();
+    reg_de=PCPU->get_de();
+    reg_hl=PCPU->get_hl();
+    reg_sp=PCPU->get_sp();
+    reg_pc=PCPU->get_pc();
+    reg_af=PCPU->get_af();
+
+    return nTicks;
+}
+
 void Emulate(int nSamples)
 {
     //static unsigned long long qwTickCount=0;
