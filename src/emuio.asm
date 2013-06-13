@@ -57,8 +57,8 @@ cglobal use_io_space
 
 cglobal snd_state
 
-cglobal EnableInts
-cglobal DisableInts
+;cglobal EnableInts
+;cglobal DisableInts
 cglobal SaveByte
 cglobal LoadByte
 cglobal SavePort
@@ -249,11 +249,17 @@ temp_byte resb 1 ; Временная ячейка
 ;- TEXT ----------------------------------------------------------------------
 [segment .text]
 
-EnableInts:
-    ret
+;EnableInts:
+;    pusha
+;    call enable_ints
+;    popa
+;    ret
 
-DisableInts:
-    ret
+;DisableInts:
+;    pusha
+;    call disable_ints
+;    popa
+;    ret
 
 LoadByte:
     push ebp

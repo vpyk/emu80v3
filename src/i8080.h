@@ -93,6 +93,9 @@ public:
 
     void i8080_jump(int addr);
 
+    void i8080_ret();
+    void i8080_rst6();
+
     int get_pc();
 
     int get_bc();

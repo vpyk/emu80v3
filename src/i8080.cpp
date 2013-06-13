@@ -1663,6 +1663,13 @@ void TCPU8080::i8080_jump(int addr) {
     PC = addr & 0xffff;
 }
 
+void TCPU8080::i8080_ret() {
+    POP(PC);
+}
+void TCPU8080::i8080_rst6() {
+            RST(0x0030);
+}
+
 int TCPU8080::get_pc(void) {
     return PC;
 }

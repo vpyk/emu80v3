@@ -2088,6 +2088,28 @@ else if (res==1)
 
 //-------------------------------------------------------------
 
+static int bIntReq=0;
+
+void ProcessInt()
+{
+    if (cModel!=MODEL_P)
+        return;
+    if (int_flag)
+    {
+        int_flag=0;
+        bIntReq=0;
+        if (LoadByte(PCPU->get_pc())==0x76)
+            PCPU->set_sp(PCPU->get_sp()+1);
+        PCPU->i8080_rst6();
+        reg_sp=PCPU->get_sp();
+        reg_pc=PCPU->get_pc();
+    }
+    else
+    {
+        bIntReq=1;
+    }
+}
+
 static int nVretrCnt=0;
 static int nCnt20ms=882;
 
@@ -2102,9 +2124,215 @@ void ProcessSample()
     {
         nCnt20ms=882;
         nVretrCnt=28;
-        process_int();
+        ProcessInt();
     }
     PlayByteNoWait(GetSample());
+}
+
+void EnableInts()
+{
+    int_flag=1;
+    if (cModel!=MODEL_P)
+        return;
+    if (bIntReq)
+        ProcessInt();
+}
+
+void DisableInts()
+{
+    int_flag=0;
+}
+
+void HookF803()
+{
+    CloseTapeFile();
+}
+
+void HookF81B()
+{
+    CloseTapeFileDelay();
+}
+
+/*;####===-- Ёмул€ци€ 0F80CH --===####
+; ¬ывод байта на магнитофон
+; C - выводимый байт*/
+void HookF80C()
+{
+    int nOutByte;
+
+    if (f_tape.cValue!=TAPE_FILE)
+        return;
+
+    //emF80C();
+    nOutByte=(cModel==MODEL_M80)?PCPU->i8080_regs_a():PCPU->i8080_regs_c();
+    WriteTapeFile(nOutByte);
+    PCPU->i8080_ret();
+    reg_sp=PCPU->get_sp();
+    reg_pc=PCPU->get_pc();
+}
+
+/*;####===-- Ёмул€ци€ 0F806H --===####
+; „тение байта с магнитофона
+; ¬ход:
+; A=8 - без ожидани€ синхробайта (E6)
+; A=FF - с ожиданием синхробайта*/
+void HookF806()
+{
+    int nInByte;
+
+    if (f_tape.cValue!=TAPE_FILE)
+        return;
+
+    //emF806();
+    if (PCPU->i8080_regs_a()==0x08)
+        nInByte=ReadTapeFile();
+    else
+        nInByte=ReadTapeFileSync();
+    reg_af&=0xFF;
+    reg_af|=(nInByte<<8);
+    PCPU->i8080_ret();
+    reg_sp=PCPU->get_sp();
+    reg_pc=PCPU->get_pc();
+}
+
+void HookProc(int nAddr) //! ¬ременно!
+{
+    switch(cModel)
+    {
+    case MODEL_A:
+        switch(nAddr)
+        {
+        case 0xfe61:
+            HookF803();
+            break;
+        case 0xfe70:
+            HookF81B();
+            break;
+        case 0xfc46:
+            HookF80C();
+            break;
+        case 0xfb98:
+            HookF806();
+            break;
+        }
+        break;
+    case MODEL_P:
+        switch(nAddr)
+        {
+        case 0xfd7b:
+            HookF803();
+            break;
+        case 0xfce9:
+            HookF81B();
+            break;
+        case 0xfc55:
+            HookF80C();
+            break;
+        case 0xfba2:
+            HookF806();
+            break;
+        }
+        break;
+    case MODEL_R:
+        switch(nAddr)
+        {
+        case 0xfe63:
+            HookF803();
+            break;
+        case 0xfe72:
+            HookF81B();
+            break;
+        case 0xfc46:
+            HookF80C();
+            break;
+        case 0xfb98:
+            HookF806();
+            break;
+        }
+        break;
+    case MODEL_M:
+        switch(nAddr)
+        {
+        case 0xfed0:
+            HookF803();
+            break;
+        case 0xfeea:
+            HookF81B();
+            break;
+        case 0xfcab:
+            HookF80C();
+            break;
+        case 0xfc0d:
+            HookF806();
+            break;
+        }
+        break;
+    case MODEL_S:
+        switch(nAddr)
+        {
+        case 0xc3370:
+            HookF803();
+            break;
+        case 0xce5c:
+            HookF81B();
+            break;
+        case 0xc3d0:
+            HookF80C();
+            break;
+        case 0xc377:
+            HookF806();
+            break;
+        }
+        break;
+    case MODEL_O:
+        switch(nAddr)
+        {
+        case 0xf803:
+            HookF803();
+            break;
+        case 0xfaee:
+            HookF81B();
+            break;
+        case 0xfa53: // f80c_adr
+            HookF80C();
+            break;
+        case 0xf9cd: //f806_adr
+            HookF806();
+            break;
+        }
+        break;
+    case MODEL_M80:
+        switch(nAddr)
+        {
+        case 0xff41:
+            HookF803();
+            break;
+        case 0xfde6:
+            HookF80C();
+            break;
+        case 0xfd95:
+            HookF806();
+            break;
+        }
+        break;
+    case MODEL_U:
+        switch(nAddr)
+        {
+        case 0xfd57:
+            HookF803();
+            break;
+        case 0xfd9a:
+            HookF81B();
+            break;
+        case 0xfbee:
+            HookF80C();
+            break;
+        case 0xfb71:
+            HookF806();
+            break;
+        }
+        break;
+    }
 }
 
 int InterpretOp()
@@ -2112,7 +2340,7 @@ int InterpretOp()
     int nTicks;
     if (reg_pc>rom_adr)
     {
-        // hooks_here
+        HookProc(reg_pc);
     }
     // workaround Orion mempages here
 
