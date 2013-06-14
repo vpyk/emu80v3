@@ -55,12 +55,20 @@ void i8080_hal_memory_write_byte(int addr, int byte) {
     SaveByte(addr&0xffff, byte);
 }
 
-int i8080_hal_io_input(int port) {
-    return LoadByte((port & 0xff)<<8 | (port & 0xff));
+int i8080_hal_io_input(int port)
+{
+    if (use_io_space)
+        return LoadPort(port);
+    else
+        return LoadByte((port & 0xff)<<8 | (port & 0xff));
 }
 
-void i8080_hal_io_output(int port, int value) {
-    SaveByte((port & 0xff)<<8 | (port & 0xff), value);
+void i8080_hal_io_output(int port, int value)
+{
+    if (use_io_space)
+        SavePort(port, value);
+    else
+        SaveByte((port & 0xff)<<8 | (port & 0xff), value);
 }
 
 void i8080_hal_iff(int on) {

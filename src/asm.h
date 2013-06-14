@@ -55,6 +55,8 @@ extern "C" void EnableInts();
 extern "C" void DisableInts();
 extern "C" int LoadByte(int nAddr);
 extern "C" void SaveByte(int nAddr, int nValue);
+extern "C" int LoadPort(int nAddr);
+extern "C" void SavePort(int nAddr, int nValue);
 
 extern "C" MENU_LINE f_speed;
 extern "C" MENU_LINE f_scr;

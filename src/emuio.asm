@@ -25,8 +25,6 @@
 
 cglobal scr_beg
 cglobal scr_end
-cglobal enable_ints
-cglobal disable_ints
 cglobal cur_xy
 cglobal cur_x
 cglobal cur_y
@@ -57,8 +55,6 @@ cglobal use_io_space
 
 cglobal snd_state
 
-;cglobal EnableInts
-;cglobal DisableInts
 cglobal SaveByte
 cglobal LoadByte
 cglobal SavePort
@@ -68,7 +64,6 @@ cglobal LoadPort
 [global load_byte]
 [global save_port]
 [global load_port]
-cglobal process_int
 [global write_byte_spec]
 [global write_byte_spec_640]
 [global write_byte_spec_800]
@@ -249,18 +244,6 @@ temp_byte resb 1 ; Временная ячейка
 ;- TEXT ----------------------------------------------------------------------
 [segment .text]
 
-;EnableInts:
-;    pusha
-;    call enable_ints
-;    popa
-;    ret
-
-;DisableInts:
-;    pusha
-;    call disable_ints
-;    popa
-;    ret
-
 LoadByte:
     push ebp
     mov ebp,esp
@@ -281,52 +264,24 @@ SaveByte:
     ret
 
 LoadPort:
+    push ebp
+    mov ebp,esp
+    mov eax, dword[ebp+8]
+    mov ah,al
+    call load_port
+    movzx eax,al
+    pop ebp
     ret
 
 SavePort:
+    push ebp
+    mov ebp,esp
+    xor eax,eax
+    mov al, byte[ebp+12]
+    mov ah, byte[ebp+8]
+    call save_port
+    pop ebp
     ret
-
-; Разрешение прерываний (EI)
-enable_ints:
-        mov byte [int_flag],1
-        cmp byte [cModel],MODEL_P
-        jne ei1
-        cmp byte [int_req],0
-        jz ei1
-        call store_regs
-        call process_int
-;       mov byte ptr cs:[int_flag],1
-ei1:    ret
-;enable_ints endp
-
-; Запрещение прерываний (DI)
-disable_ints:
-        mov byte [int_flag],0
-        ret
-;disable_ints endp
-
-; Обработка прерывания
-process_int:
-        cmp byte [cModel],MODEL_P ; Нужно ли?
-        jne pi1 ; Работает только для "Партнера"
-       call restore_regs
-       cmp byte [int_flag],0
-       jnz pi2
-       mov byte [int_req],1
-       jmp pi1
-pi2:   mov byte [int_flag],0
-       mov byte [int_req],0
-       push ebp
-       mov ebp,dword[mem]
-       cmp byte [ebp+esi],76h ; HLT
-       je pi3
-       dec si
-pi3:   call rst6
-       call store_regs
-       pop ebp
-pi1:   ret
-;process_int endp
-
 
 ; Вызывается при попытке записи в память
 ; BP-адрес, AH-значение

@@ -115,7 +115,6 @@ switch (cModel)
     rom_len=0x1000;
     ppi_portc_adr=0xd902;
     crt_port1_adr=0xd801;
-    hook_proc_sb=hook_p_sb;
 //    ext_letter='P'; //!!!!!
     ticks_per_44100th=45;
     delay_sb_dma=31;
@@ -132,7 +131,6 @@ switch (cModel)
     ppi_portc_adr=0xee02;
     crt_port1_adr=0xef01;
     romname="roms/roma.bin";
-    hook_proc_sb=hook_a_sb;
 //    ext_letter='A'; //!!!!!
     break;
   case MODEL_M:
@@ -145,7 +143,6 @@ switch (cModel)
     ppi_portc_adr=0xc002;
     crt_port1_adr=0xd001;
     romname="roms/romm.bin";
-    hook_proc_sb=hook_m_sb;
 //    ext_letter='M'; //!!!!!
     delay_sb_dma=29;   //
     break;
@@ -157,7 +154,6 @@ switch (cModel)
     rom_len=0x0800;
     ppi_portc_adr=0x8002;
     crt_port1_adr=0xc001;
-    hook_proc_sb=hook_r_sb;
 //    ext_letter='R'; /!!!!!
     break;
   case MODEL_S:
@@ -167,7 +163,6 @@ switch (cModel)
     rom_adr=0xc000;
     ppi_portc_adr=0xd902;
     crt_port1_adr=0xd801;
-    hook_proc_sb=hook_s_sb;
 //    ext_letter='S'; //!!!!!
     reset_addr=0xc000;
     ticks_per_44100th=45;
@@ -182,7 +177,6 @@ switch (cModel)
     rom_len=0x800;
     ppi_portc_adr=0xf402;
     crt_port1_adr=0xd801;
-    hook_proc_sb=hook_o_sb;
 //    ext_letter='O'; //!!!!!
     reset_addr=0xf800;
     ticks_per_44100th=57;
@@ -196,7 +190,6 @@ switch (cModel)
     cur_corr=0x0;
     rom_adr=0xf800;
     rom_len=0x800;
-    hook_proc_sb=hook_m80_sb;
 //    ext_letter='8'; //!!!!!
     ticks_per_44100th=450;
     delay_sb_dma=40;
@@ -209,7 +202,6 @@ switch (cModel)
     cur_corr=0x0;
     rom_adr=0xf800;
     rom_len=0x800;
-    hook_proc_sb=hook_u_sb;
 //    ext_letter='U'; //!!!!!
     ticks_per_44100th=450;
     delay_sb_dma=40;
@@ -1047,9 +1039,10 @@ reg_de=mh.wDE;
 reg_hl=mh.wHL;
 reg_sp=mh.wSP;
 if (mh.cIF==1)
-  enable_ints();
+  int_flag=1;
 else
-  disable_ints();
+  int_flag=0;
+//!! Enable/Disable Ints!
 
 char cTemp;
 int wHLen;
@@ -1752,7 +1745,7 @@ static char *ppcHelp[19]={" ƒ®àïç¨¥ ª« ¢¨è¨ ¢ à¥¦¨¬¥ í¬ã«ïæ¨¨: ",
                          "  Alt-A ......  ¯à®£à ¬¬¥  ",
                          };
 
-static char *ppcAbout[2]={"   Emu80/SDL  v. 3.12 test 2",
+static char *ppcAbout[2]={"   Emu80/SDL  v. 3.13 test",
                           "(c) 1997-2013 Victor Pykhonin",
                           };
 
@@ -2342,7 +2335,6 @@ int InterpretOp()
     {
         HookProc(reg_pc);
     }
-    // workaround Orion mempages here
 
     PCPU->set_bc(reg_bc);
     PCPU->set_de(reg_de);

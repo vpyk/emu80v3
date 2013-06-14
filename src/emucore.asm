@@ -30,15 +30,6 @@ cglobal rom_adr
 cglobal ppi_portc_adr
 cglobal crt_port1_adr
 cglobal romname
-cglobal hook_proc_sb
-cglobal hook_p_sb
-cglobal hook_r_sb
-cglobal hook_a_sb
-cglobal hook_m_sb
-cglobal hook_s_sb
-cglobal hook_o_sb
-cglobal hook_m80_sb
-cglobal hook_u_sb
 cglobal Reset
 ;cglobal InterpretOp
 cglobal ProcessQuery
@@ -119,9 +110,6 @@ cextern bWaitSnd              ;!!!word
 ;[extern emF812]                ;near
 [extern emF80C]                ;near
 [extern emF806]                ;near
-[extern code_tbl]              ;!!!word
-[extern code_tbl_m]            ;!!!word
-[extern code_tbl_m2]           ;!!!word
 ;[extern inittimer]             ;near
 ;[extern getcount]              ;near
 ;[extern f_led]                 ;byte
@@ -172,7 +160,6 @@ cextern process_int           ;near
 ;[extern FontsError]            ;near
 ;[extern ROMDiskError]          ;near
 ;[extern cMonitor]              ;byte
-[extern emu_ret]               ;near
 ;[extern f_novesa]              ;byte
 ;[extern wSBPort]               ;word
 ;[extern wSBDMA]                ;word
@@ -257,8 +244,6 @@ c_table resd 1
 
 f806_adr resw 1 ; Адрес процедуры чтения байта с магнитофона
 f80c_adr resw 1 ; Адрес процедуры записи байта на магнитофон
-
-hook_proc_sb  resd 1 ;!!! Адрес процедуры перехвата - Sound Blaster
 
 ;interpret_proc resd 1 ;!!! Адрес процедуры основного цикла
 
@@ -494,7 +479,6 @@ ap2:   cmp byte [f_scr],SCR_GRAPH
        ;call RefreshMenu ; !!!
        jmp ap3
 ap3:    call LeaveInteractiveMode
-        mov dword [c_table], code_tbl_m2
        call process_port_c
         cmp byte [f_chscr],0 ; ???
         jz ap9
@@ -575,52 +559,6 @@ Reset:
         call perform_reset
         ret
 
-InterpretOp:
-        push ebp
-        mov ebp,esp
-        call restore_regs
-
-; Начало основного цикла
-cont_interpret:
-        ; Проверяем, не попали ли в Монитор
-        cmp si,word [rom_adr]
-        jb inter2
-        jmp dword [hook_proc_sb]
-
-inter2:
-        ; Берем адрес процедуры из таблицы ...
-        mov ebp,dword [c_table]
-        push ebx
-        mov ebx, dword [mem]
-        ; Запоминаем адрес тек. страницы памяти
-        mov dword [mem_fetch], ebx
-        ; Не попали ли в системную область?
-        cmp si,0f000h
-        jb i_pag
-        ; Если да, то берем данные из 0-й
-        mov ebx, dword [mempage0]
-        mov dword [mem_fetch],ebx
-i_pag:  movzx ebx,byte [ebx+esi]
-        add ebx,ebx
-        add ebx,ebx
-        add ebp,ebx
-        pop ebx
-        mov ebp,dword [ebp]
-        ; В режиме паузы ничего не делаем
-        cmp byte [f_pause],0
-        jnz ip2
-        ; Вызываем обработчик команды
-        call ebp
-
-        call store_regs
-        movzx eax,bp
-        pop ebp
-        ret
-ip2:    call store_regs
-        mov eax,10
-        pop ebp
-        ret
-
 ; сюда управление попадает 50 раз в секунду
 ProcessQuery:
         push ebp
@@ -646,125 +584,18 @@ PrepareScreen:
 
 ;######################
 
-hook_a_sb:
-        cmp si,0fe61h
-        jz near _f803
-        cmp si,0fe70h
-        jz near _f81b
-        cmp si,0fc46h
-        jz near _f80c
-        cmp si,0fb98h
-        jz near _f806
-        jmp inter2
-
-hook_p_sb:
-        cmp si,0fd7bh
-        jz near _f803
-        cmp si,0fce9h
-        jz near _f81b
-        cmp si,0fc55h
-        jz near _f80c
-        cmp si,0fba2h
-        jz near _f806
-        jmp inter2
-
-hook_r_sb:
-        cmp si,0fe63h
-        jz near _f803
-        cmp si,0fe72h
-        jz near _f81b
-        cmp si,0fc46h
-        jz near _f80c
-        cmp si,0fb98h
-        jz near _f806
-        jmp inter2
-
-hook_m_sb:
-        cmp si,0fed0h
-        jz near _f803
-        cmp si,0feeah
-        jz near _f81b
-        cmp si,0fcabh
-        jz near _f80c
-        cmp si,0fc0dh
-        jz near _f806
-        jmp inter2
-
-hook_s_sb:
-        cmp si,0c337h
-        jz near _f803
-        cmp si,0ce5ch
-        jz near _f81b
-        cmp si,0c3d0h
-        jz near _f80c_s
-        cmp si,0c377h
-        jz near _f806
-        jmp inter2
-
-hook_o_sb:
-        cmp si,0f803h
-        jz near _f803
-        cmp si,0faeeh
-        jz near _f81b
-;        cmp si,0fa53h
-        cmp si,word [f80c_adr]
-        jz _f80c
-;        cmp si,0f9cdh
-        cmp si,word [f806_adr]
-        jz near _f806
-        jmp inter2
-
-hook_m80_sb:
-        cmp si,0ff41h
-        jz near _f803
-        cmp si,0fde6h
-        jz _f80c
-        cmp si,0fd95h
-        jz _f806
-        jmp inter2
-
-hook_u_sb:
-        cmp si,0fd57h
-        jz _f803
-        cmp si,0fd9ah
-        jz _f81b
-        cmp si,0fbeeh
-        jz _f80c
-        cmp si,0fb71h
-        jz _f806
-        jmp inter2
-
-_f80c:
-        cmp byte [f_tape],TAPE_FILE
-        jne inter2
-        call emF80C
-        call emu_ret
-        jmp cont_interpret
-
-_f80c_s:
-        cmp byte [f_tape],TAPE_FILE
-        jne inter2
-        push cx
-        mov cl,al
-        call emF80C
-        pop cx
-        call emu_ret
-        jmp cont_interpret
-
-_f806:
-        cmp byte [f_tape],TAPE_FILE
-        jne inter2
-        call emF806
-        call emu_ret
-        jmp cont_interpret
-
-_f803:
-        call close_file ; Если работали с файлом, то его закрыть
-        jmp inter2
-
-_f81b:
-        call close_file_delay ; Если работали с файлом, то его закрыть
-        jmp inter2
+;hook_o_sb:
+;        cmp si,0f803h
+;        jz near _f803
+;        cmp si,0faeeh
+;        jz near _f81b
+;;        cmp si,0fa53h
+;        cmp si,word [f80c_adr]
+;        jz _f80c
+;;        cmp si,0f9cdh
+;        cmp si,word [f806_adr]
+;        jz near _f806
+;        jmp inter2
 
 ;##############################################################
 

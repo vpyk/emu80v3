@@ -29,7 +29,6 @@ SET (emu80_SOURCES
   i8080.cpp
   i8080_hal.cpp
   emucore.asm
-  emucpu.asm
   emuio.asm
   emukeyb.asm
   emumisc.asm
