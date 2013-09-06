@@ -28,6 +28,10 @@ SET (emu80_SOURCES
   sound.cpp
   i8080.cpp
   i8080_hal.cpp
+  dialogs.cpp
+  io_device.cpp
+  io_vi53.cpp
+  io_vv55.cpp
   emucore.asm
   emuio.asm
   emukeyb.asm
