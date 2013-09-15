@@ -19,7 +19,6 @@ include_directories(${SDL_INCLUDE_DIR})
 
 SET (emu80_SOURCES
   emuinit.cpp
-  io_vi53.cpp
   main.cpp
   menus.cpp
   misc.cpp
@@ -31,6 +30,7 @@ SET (emu80_SOURCES
   dialogs.cpp
   io_device.cpp
   io_vi53.cpp
+  io_vg93.cpp
   io_vv55.cpp
   emucore.asm
   emuio.asm

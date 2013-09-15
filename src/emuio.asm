@@ -106,6 +106,10 @@ cextern ReadPITReg    ; dword
 cextern ProcessTime   ; dword
 cextern GetSample     ; dword
 
+cextern InitFDC       ; dword
+cextern WriteFDCReg   ; dword
+cextern ReadFDCReg    ; dword
+
 [extern symtable_ptr]  ; dword
 [extern cur_offs]      ;
 ;[extern f_vid]         ; byte
@@ -1526,6 +1530,7 @@ perform_reset:
         pusha
       __align_sp
         call InitPIT
+        call InitFDC
       __restore_sp
         popa
 
@@ -1577,247 +1582,28 @@ po1:   ret
 ; ######################### ЭМУЛЯЦИЯ ДИСКОВОДА #########################
 
 disk_in:
-        test bp,24h
-        mov ah,0
-        jnz diQ
-        and bp,3
-        cmp bp,0
-        je disk_stat_in
-        cmp bp,1
-        je disk_cyl_in
-        cmp bp,2
-        je disk_sect_in
-        jmp disk_data_in
-diQ:    ret
-
-; Чтение регистра статуса
-disk_stat_in:
-        mov ah,0
-        cmp byte [b_transfer],0
-        jz diQ
-        mov ah,3
+        pusha
+      __align_sp
+        push ebp
+        call ReadFDCReg
+        add esp,4
+        mov byte [temp_byte], al
+      __restore_sp
+        popa
+        mov ah,byte [temp_byte]
         ret
-
-; Чтение регистра дорожки
-disk_cyl_in:
-        mov ah, byte [cyl]
-        ret
-
-; Чтение регистра сектора
-disk_sect_in:
-        mov ah, byte [sect]
-        ret
-
-; Чтение регистра данных
-disk_data_in:
-        mov ah,0
-        cmp byte [b_transfer],0
-        jz diQ
-        push ebx
-        push esi
-        movzx ebx, word [sect_ofs]
-        inc word [sect_ofs]
-        mov esi, dword [cur_sect_buf]
-        mov ah, byte [ebx+esi]
-        pop esi
-        cmp bx,3ffh
-        pop ebx
-        jnz ddiQ
-        mov word [sect_ofs],0
-        mov byte [b_transfer],0
-
-ddiQ:   ret
-;disk_in endp
 
 disk_out:
-        test bp,24h
-        jnz disk_ctrl_out
-        and bp,3
-        cmp bp,0
-        je near disk_cmd_out
-        cmp bp,1
-        je near disk_cyl_out
-        cmp bp,2
-        je near disk_sect_out
-        jmp disk_data_out
-
-; Запись в регистр управления
-disk_ctrl_out:
-        mov al,ah
-        and ah,1
-        mov byte [disk],ah
-        and al,10h
-        shr al,4
-        xor al,1
-        mov byte [head],al
-        ret
-
-; Запись регистра данных
-disk_data_out:
-        mov byte [vg_data_reg],ah
-        cmp byte [b_transfer],0
-        jz ddoQ
-        cmp byte [b_read],0
-        jnz ddoQ
-        push ebx
-        push esi
-        movzx ebx, word [sect_ofs]
-        inc word [sect_ofs]
-        mov esi, dword [cur_sect_buf]
-        mov byte [ebx+esi],ah
-        pop esi
-        cmp bx,3ffh
-        pop ebx
-        jnz ddiQ
-        mov word [sect_ofs],0
-        mov byte [b_transfer],0
-
         pusha
       __align_sp
-        movzx eax, byte [sect]
-        push eax
-        mov al, byte [head]
-        push eax
-        mov al, byte [cyl]
-        push eax
-        mov al, byte [disk]
-        push eax
-        call WriteSector ;!!!
-        add esp,16
-      __restore_sp
-        popa
-
-ddoQ:   ret
-
-; Запись регистра дорожки
-disk_cyl_out:
-        mov byte [cyl],ah
-        ret
-
-; Запись регистра сектора
-disk_sect_out:
-        mov byte [sect],ah
-        ret
-
-; Запись регистра команд
-disk_cmd_out:
-        mov byte [b_transfer],0
-        push ax
         mov al,ah
-        and al,0f0h
-        cmp al,0
-        je cmd_reset
-        cmp al,10h
-        je cmd_seek
-        cmp al,20h
-        je cmd_step
-        cmp al,30h
-        je cmd_step
-        cmp al,40h
-        je cmd_stepup
-        cmp al,50h
-        je cmd_stepup
-        cmp al,60h
-        je cmd_stepdown
-        cmp al,70h
-        je cmd_stepdown
-        cmp al,80h
-        je cmd_read_sector
-        cmp al,90h
-        je cmd_read_sector
-        cmp al,0a0h
-        je near cmd_write_sector
-        cmp al,0b0h
-        je near cmd_write_sector
-        ; Остальные не реализовываем...
-dcoQ:   pop ax
-        ret
-
-; Восстановление
-cmd_reset:
-        mov byte [cyl],0
-        pop ax
-        ret
-
-; Поиск
-cmd_seek:
-        mov ah, byte [vg_data_reg]
-        cmp ah,79h
-        ja dcoQ
-        mov byte [cyl],ah
-        pop ax
-        ret
-
-; Шаг #########
-cmd_step:
-        cmp byte [b_stdn],0
-        jnz cmd_stepdown
-cmd_stepup:
-;        test ah,10h
-;        jz csQ
-        mov byte [b_stdn],0
-        cmp byte [cyl],79
-        jl csQ
-        inc byte [cyl]
-csQ:    pop ax
-        ret
-cmd_stepdown:
-;        test ah,10h
-;        jz csQ
-        mov byte [b_stdn],1
-        cmp byte [cyl],0
-        ja csQ
-        dec byte [cyl]
-        pop ax
-        ret
-
-; Чтение сектора
-cmd_read_sector:
+        and eax,0FFh
         push eax
-        cmp byte [disk],0
-        mov eax, acSectBufA
-        je crs1
-        mov eax, acSectBufB
-crs1:   mov dword [cur_sect_buf],eax
-        pop eax
-        mov byte [b_transfer],1
-        mov byte [b_read],1
-        mov word [sect_ofs],0
-
-        pusha
-      __align_sp
-        movzx eax, byte [sect]
-        push eax
-        mov al, byte [head]
-        push eax
-        mov al, byte [cyl]
-        push eax
-        mov al, byte [disk]
-        push eax
-        call ReadSector ;!!!
-        add esp,16
+        push ebp
+        call WriteFDCReg
+        add esp,8
       __restore_sp
         popa
-
-        pop ax
         ret
-
-; Запись сектора
-cmd_write_sector:
-        cmp byte [disk],0
-        push eax
-        mov eax, acSectBufA
-        je cws1
-        mov eax, acSectBufB
-cws1:   mov dword [cur_sect_buf],eax
-        pop eax
-        mov byte [b_transfer],1
-        mov byte [b_read],0
-        mov word [sect_ofs],0
-
-        pop ax
-        ret
-
-;disk_out endp
 
 ;end

@@ -379,28 +379,28 @@ else
   fDiskB=f;
 }
 
-void ReadSector(long nDisk, long nTrack, long nHead, long nSector)
+void ReadSector(long nDisk, long nTrack, long nHead, long nSector, uint8_t *pbBuf)
 {
 // printf("Read  %d %d %d %d\n",wDisk,wTrack,wHead,wSector);
 FILE *f=nDisk?fDiskB:fDiskA;
-unsigned char *buf=nDisk?acSectBufB:acSectBufA;
-memset(buf,0xe5,1024);
+//unsigned char *buf=nDisk?acSectBufB:acSectBufA;
+memset(pbBuf,0xe5,1024);
 if (f)
   {
   fseek(f,nTrack*10240+nHead*5120+(nSector-1)*1024,SEEK_SET);
-  fread(buf,1024,1,f);
+  fread(pbBuf,1024,1,f);
   }
 }
 
-void WriteSector(long nDisk, long nTrack, long nHead, long nSector)
+void WriteSector(long nDisk, long nTrack, long nHead, long nSector, uint8_t *pbBuf)
 {
 // printf("Write %d %d %d %d\n",wDisk,wTrack,wHead,wSector);
 FILE *f=nDisk?fDiskB:fDiskA;
-unsigned char *buf=nDisk?acSectBufB:acSectBufA;
+//unsigned char *buf=nDisk?acSectBufB:acSectBufA;
 if (f)
   {
   fseek(f,nTrack*10240+nHead*5120+(nSector-1)*1024,SEEK_SET);
-  fwrite(buf,1024,1,f);
+  fwrite(pbBuf,1024,1,f);
   }
 }
 
@@ -1745,7 +1745,7 @@ static char *ppcHelp[19]={" Горячие клавиши в режиме эмуляции: ",
                          "  Alt-A ...... О программе  ",
                          };
 
-static char *ppcAbout[2]={"   Emu80/SDL  v. 3.13 test",
+static char *ppcAbout[2]={"   Emu80/SDL  v. 3.14 development",
                           "(c) 1997-2013 Victor Pykhonin",
                           };
 

@@ -65,6 +65,8 @@
 		</Unit>
 		<Unit filename="io_device.cpp" />
 		<Unit filename="io_device.h" />
+		<Unit filename="io_vg93.cpp" />
+		<Unit filename="io_vg93.h" />
 		<Unit filename="io_vi53.cpp" />
 		<Unit filename="io_vi53.h" />
 		<Unit filename="io_vv55.cpp" />

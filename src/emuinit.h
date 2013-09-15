@@ -24,8 +24,8 @@
 extern "C" int ChooseModel();
 extern "C" int ChooseROM();
 extern "C" void AlterSpeed(short nSysReq);
-extern "C" void ReadSector(long nDisk, long nTrack, long nHead, long nSector);
-extern "C" void WriteSector(long nDisk, long nTrack, long nHead, long nSector);
+extern "C" void ReadSector(long nDisk, long nTrack, long nHead, long nSector, uint8_t *pbBuf);
+extern "C" void WriteSector(long nDisk, long nTrack, long nHead, long nSector, uint8_t *pbBuf);
 extern "C" void RefreshMenu();
 extern "C" void TuneMenu();
 extern "C" void LoadIniParams();

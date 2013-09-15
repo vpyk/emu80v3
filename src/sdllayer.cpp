@@ -81,7 +81,7 @@ if (!bMute)
   bMute=SDL_InitSubSystem(SDL_INIT_AUDIO);
 
 char pcDrvName[20];
-strcpy(pcCaption, "Emu80/SDL v. 3.13 test (video: ");
+strcpy(pcCaption, "Emu80/SDL v. 3.14 development (video: ");
 SDL_VideoDriverName(pcDrvName, 20);
 strcat(pcCaption,pcDrvName);
 if (!bMute)
