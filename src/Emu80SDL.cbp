@@ -63,6 +63,8 @@
 		<Unit filename="emukeyb.asm">
 			<Option compiler="gcc" use="1" buildCommand="nasm -f win32 -Dwin32 $file -o $object" />
 		</Unit>
+		<Unit filename="emulation.cpp" />
+		<Unit filename="emulation.h" />
 		<Unit filename="emumisc.asm">
 			<Option compiler="gcc" use="1" buildCommand="nasm -f win32 -Dwin32 $file -o $object" />
 		</Unit>
@@ -86,10 +88,18 @@
 		<Unit filename="io_vv55.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="main.h" />
+		<Unit filename="mem_plain.cpp" />
+		<Unit filename="mem_plain.h" />
+		<Unit filename="memory.cpp" />
+		<Unit filename="memory.h" />
 		<Unit filename="menus.cpp" />
 		<Unit filename="menus.h" />
 		<Unit filename="misc.cpp" />
 		<Unit filename="misc.h" />
+		<Unit filename="platform.cpp" />
+		<Unit filename="platform.h" />
+		<Unit filename="rk86.cpp" />
+		<Unit filename="rk86.h" />
 		<Unit filename="rss.h" />
 		<Unit filename="scrdraw.cpp" />
 		<Unit filename="scrdraw.h" />
