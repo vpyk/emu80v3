@@ -45,10 +45,10 @@ enum TFDCOperation
 };
 
 
-class FDC1793 : public TIODevice
+class TFDC1793 : public TIODevice
 {
 public:
-    FDC1793(TFDCType pkFDCType=ftGeneral);
+    TFDC1793(TFDCType pkFDCType=ftGeneral);
     void InitDevice();
     void WriteReg(uint16_t wReg, uint8_t bValue);
     uint8_t ReadReg(uint16_t wReg);
@@ -73,7 +73,7 @@ private:
 extern "C" void InitFDC();
 extern "C" void WriteFDCReg(uint16_t wReg, uint8_t bValue);
 extern "C" uint8_t ReadFDCReg(uint16_t wReg);
-//void LoadPITState(RKSS_FDC_STATE *fdcState);
-//void SavePITState(RKSS_FDC_STATE *fdcState);
+//void LoadFDCState(RKSS_FDC_STATE *fdcState);
+//void SaveFDCState(RKSS_FDC_STATE *fdcState);
 
 #endif // _IO_VG93_H

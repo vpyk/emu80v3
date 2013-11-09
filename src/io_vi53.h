@@ -61,10 +61,10 @@ enum TPITType
     ptRK86=1
 };
 
-class Timer8253 : public TIODevice
+class TTimer8253 : public TIODevice
 {
 public:
-    Timer8253(TPITType pkPITType=ptGeneral);
+    TTimer8253(TPITType pkPITType=ptGeneral);
     void StartCount(int nCnt);
     void InitDevice();
     void WriteReg(uint16_t wReg, uint8_t bValue);

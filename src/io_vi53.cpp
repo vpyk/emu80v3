@@ -34,18 +34,18 @@ uint16_t wPartnerCnt=0;
 const uint8_t wPartnerInitCnt=28;
 uint8_t bPartnerOutput=0;
 
-Timer8253::Timer8253(TPITType ptPITType)
+TTimer8253::TTimer8253(TPITType ptPITType)
 {
     InitDevice();
     ptType=ptPITType;
 }
 
-void Timer8253::SetPITType(TPITType ptPITType)
+void TTimer8253::SetPITType(TPITType ptPITType)
 {
     ptType=ptPITType;
 }
 
-void Timer8253::StartCount(int nCnt)
+void TTimer8253::StartCount(int nCnt)
 {
     wPITCounter[nCnt]=wPITInitCnt[nCnt];
     switch (bPITMode[nCnt])
@@ -60,7 +60,7 @@ void Timer8253::StartCount(int nCnt)
     return;
 }
 
-void Timer8253::InitDevice()
+void TTimer8253::InitDevice()
 {
     for(int i=0;i<3;i++)
     {
@@ -86,7 +86,7 @@ void Timer8253::InitDevice()
     }*/
 }
 
-void Timer8253::WriteReg(uint16_t wReg, uint8_t bValue)
+void TTimer8253::WriteReg(uint16_t wReg, uint8_t bValue)
 {
     wReg&=0x3;
     if (wReg==0x03) // CSW
@@ -155,7 +155,7 @@ void Timer8253::WriteReg(uint16_t wReg, uint8_t bValue)
     }
 }
 
-uint8_t Timer8253::ReadReg(uint16_t wReg)
+uint8_t TTimer8253::ReadReg(uint16_t wReg)
 {
     wReg&=0x03;
     if (wReg==3)
@@ -182,7 +182,7 @@ uint8_t Timer8253::ReadReg(uint16_t wReg)
     }
 }
 
-void Timer8253::ProcessTime(int nTicks)
+void TTimer8253::ProcessTime(int nTicks)
 {
     int nPulses[3]; // Количество переходов через 0
     int nTicksCnt;
@@ -254,12 +254,12 @@ void Timer8253::ProcessTime(int nTicks)
     }
 }
 
-uint8_t Timer8253::GetOutput(uint8_t bCnt)
+uint8_t TTimer8253::GetOutput(uint8_t bCnt)
 {
     return bPITOutput[bCnt];
 }
 
-uint8_t Timer8253::GetSample() //!!! Вынести в TPlatform
+uint8_t TTimer8253::GetSample() //!!! Вынести в TPlatform
 {
     uint8_t bRes=0;
     switch (cModel) //!!!
@@ -302,7 +302,7 @@ uint8_t Timer8253::GetSample() //!!! Вынести в TPlatform
 }
 
 
-void Timer8253::SavePITState(RKSS_PIT_STATE *pitState)
+void TTimer8253::SavePITState(RKSS_PIT_STATE *pitState)
 {
     pitState->wPitK0=wPITInitCnt[0];
     pitState->wPitK1=wPITInitCnt[1];
@@ -318,7 +318,7 @@ void Timer8253::SavePITState(RKSS_PIT_STATE *pitState)
     pitState->bPitLd2=bPITState[2]==stWorking;
 }
 
-void Timer8253::LoadPITState(RKSS_PIT_STATE *pitState)
+void TTimer8253::LoadPITState(RKSS_PIT_STATE *pitState)
 {
     bPITCSW[0]=pitState->bPitMode0;
     bPITCSW[1]=pitState->bPitMode1;
@@ -350,12 +350,12 @@ void Timer8253::LoadPITState(RKSS_PIT_STATE *pitState)
 
 // --- Temporary Stubs for ASM ---------------------------------------------
 
-static class Timer8253 *PTimer = NULL;
+static class TTimer8253 *PTimer = NULL;
 
 void InitPIT()
 {
     if (!PTimer)
-        PTimer = new Timer8253(cModel!=MODEL_R?ptGeneral:ptRK86);
+        PTimer = new TTimer8253(cModel!=MODEL_R?ptGeneral:ptRK86);
     else
     {
         PTimer->InitDevice();
@@ -383,7 +383,7 @@ void ProcessTime(long lTicks)
     PTimer->ProcessTime(lTicks);
 }
 
-//uint8_t Timer8253.GetOutput(uint8_t bCnt)
+//uint8_t TTimer8253.GetOutput(uint8_t bCnt)
 
 uint8_t GetSample()
 {

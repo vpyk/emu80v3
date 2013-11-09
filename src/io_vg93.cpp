@@ -28,18 +28,18 @@
 #include "emuinit.h"
 #include "io_vg93.h"
 
-FDC1793::FDC1793(TFDCType ftFDCType)
+TFDC1793::TFDC1793(TFDCType ftFDCType)
 {
     InitDevice();
     ftType=ftFDCType;
 }
 
-void FDC1793::SetFDCType(TFDCType ftFDCType)
+void TFDC1793::SetFDCType(TFDCType ftFDCType)
 {
     ftType=ftFDCType;
 }
 
-void FDC1793::InitDevice()
+void TFDC1793::InitDevice()
 {
     wDisk=0;
     wHead=0;
@@ -50,7 +50,7 @@ void FDC1793::InitDevice()
     sdDirection=sdIn;
 }
 
-void FDC1793::WriteReg(uint16_t wReg, uint8_t bValue)
+void TFDC1793::WriteReg(uint16_t wReg, uint8_t bValue)
 {
     if (ftType==ftOrion && (wReg&0x24)) // Запись в решистр управления "Ориона"
     { // AFAIR 0x24 - для двух типов подключения (0x20 и 0x04)
@@ -131,7 +131,7 @@ void FDC1793::WriteReg(uint16_t wReg, uint8_t bValue)
     }
 }
 
-uint8_t FDC1793::ReadReg(uint16_t wReg)
+uint8_t TFDC1793::ReadReg(uint16_t wReg)
 {
     uint8_t bValue;
 
@@ -161,29 +161,29 @@ uint8_t FDC1793::ReadReg(uint16_t wReg)
     }
 }
 
-void FDC1793::ProcessTime(int nTicks)
+void TFDC1793::ProcessTime(int nTicks)
 {
     return;
 }
 
-/*void FDC1793::SaveFDCState(RKSS_FDC_STATE *fdcState)
+/*void TFDC1793::SaveFDCState(RKSS_FDC_STATE *fdcState)
 {
     pitState->wPitK0=wPITInitCnt[0];
 }**/
 
-/*void FDC1793::LoadDFCState(RKSS_FDC_STATE *fdcState)
+/*void TFDC1793::LoadDFCState(RKSS_FDC_STATE *fdcState)
 {
     bPITCSW[0]=pitState->bPitMode0;
 }*/
 
 // --- Temporary Stubs for ASM ---------------------------------------------
 
-static class FDC1793 *PFDC = NULL;
+static class TFDC1793 *PFDC = NULL;
 
 void InitFDC()
 {
     if (!PFDC)
-        PFDC = new FDC1793(cModel!=MODEL_O?ftGeneral:ftOrion);
+        PFDC = new TFDC1793(cModel!=MODEL_O?ftGeneral:ftOrion);
     else
     {
         PFDC->InitDevice();
