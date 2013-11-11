@@ -32,6 +32,11 @@ SET (emu80_SOURCES
   io_vi53.cpp
   io_vg93.cpp
   io_vv55.cpp
+  emulation.cpp
+  platform.cpp
+  rk86.cpp
+  memory.cpp
+  mem_plain.cpp
   emucore.asm
   emuio.asm
   emukeyb.asm

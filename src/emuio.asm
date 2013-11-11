@@ -110,6 +110,12 @@ cextern InitFDC       ; dword
 cextern WriteFDCReg   ; dword
 cextern ReadFDCReg    ; dword
 
+cextern InitPPI       ; dword
+cextern WritePPIReg   ; dword
+cextern ReadPPIReg    ; dword
+cextern WritePPI2Reg   ; dword
+cextern ReadPPI2Reg    ; dword
+
 [extern symtable_ptr]  ; dword
 [extern cur_offs]      ;
 ;[extern f_vid]         ; byte
@@ -1531,6 +1537,7 @@ perform_reset:
       __align_sp
         call InitPIT
         call InitFDC
+        call InitPPI
       __restore_sp
         popa
 

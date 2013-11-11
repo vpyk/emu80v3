@@ -25,6 +25,9 @@
 
 #include "io_vv55.h"
 
+#include "emuinit.h" //!!!
+#include "emu80.h"   //!!!
+
 TPPI8255::TPPI8255()
 {
     //ctor
@@ -42,12 +45,43 @@ void TPPI8255::InitDevice()
 
 void TPPI8255::WriteReg(uint16_t wReg, uint8_t bValue)
 {
-    //write reg
+    wReg&=3;
+    switch(wReg)
+    {
+    case 0:
+        bPortA = bValue;
+        break;
+    case 1:
+        bPortB = bValue;
+        break;
+    case 2:
+        bPortC = bValue;
+        break;
+    default: //ctrl reg
+        if (!(bValue&0x80))
+        {
+            int nBit=(bValue&0x0e)>>1;
+            uint8_t bMask = ~(1<<nBit);
+            bPortC&=~bMask;
+            bPortC=(bValue&1)<<nBit;
+        }
+    }
 }
 
 uint8_t TPPI8255::ReadReg(uint16_t wReg)
 {
-    //read reg
+    wReg&=3;
+    switch(wReg)
+    {
+    case 0:
+        return bPortA;
+    case 1:
+        return bPortB;
+    case 2:
+        return bPortC;
+    default: // ctrl reg
+        return 0xFF; // undefined
+    }
 }
 
 void TPPI8255::ProcessTime(int nTicks)
@@ -58,6 +92,7 @@ void TPPI8255::ProcessTime(int nTicks)
 // --- Temporary Stubs for ASM ---------------------------------------------
 
 static TPPI8255 *PPPI = NULL;
+static TPPI8255 *PPPI2 = NULL;
 
 void InitPPI()
 {
@@ -65,5 +100,55 @@ void InitPPI()
         PPPI = new TPPI8255;
     else
         PPPI->InitDevice();
+
+    if (!PPPI2)
+        PPPI2 = new TPPI8255;
+    else
+        PPPI2->InitDevice();
+
 }
 
+void WritePPIReg(uint16_t wReg, uint8_t bValue)
+{
+    PPPI->WriteReg(wReg, bValue);
+    switch (cModel)
+    {
+    case MODEL_R:
+    case MODEL_M:
+    case MODEL_A:
+    case MODEL_O:
+        // rk clones code here
+        break;
+    case MODEL_S:
+        // specialist code here
+        ;
+    }
+}
+
+void WritePPI2Reg(uint16_t wReg, uint8_t bValue)
+{
+    PPPI2->WriteReg(wReg, bValue);
+    switch (cModel)
+    {
+    case MODEL_M:
+        // mikrosha code here
+        break;
+    case MODEL_O:
+        // orion code here
+        ;
+    }
+}
+
+uint8_t ReadPPI2Reg(uint16_t wReg)
+{
+    switch (cModel)
+    {
+    case MODEL_M:
+        // mikrosha code here
+        break;
+    case MODEL_O:
+        // orion code here
+        ;
+    }
+    return PPPI2->ReadReg(wReg);
+}
