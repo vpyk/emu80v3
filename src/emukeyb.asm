@@ -39,15 +39,17 @@ cglobal ex_int_09
 cglobal set_new_09_vect
 cglobal restore_09_vect
 cglobal corr_key_tbl
+cglobal led_state
 
 cglobal FlushKeys
 
-[global key_bytes]
-[global ctrl_keys]
+cglobal key_bytes
+cglobal ctrl_keys
+cglobal key_bytes_s
+cglobal ctrl_keys_s
+
 [global joy_state]
-[global key_bytes_s]
-[global ctrl_keys_s]
-[global led_state]
+
 ;public light_led
 [global f_led]
 

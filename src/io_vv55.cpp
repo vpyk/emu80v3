@@ -27,6 +27,7 @@
 
 #include "emuinit.h" //!!!
 #include "emu80.h"   //!!!
+#include "asm.h"     //!!!
 
 TPPI8255::TPPI8255()
 {
@@ -64,6 +65,12 @@ void TPPI8255::WriteReg(uint16_t wReg, uint8_t bValue)
             uint8_t bMask = ~(1<<nBit);
             bPortC&=~bMask;
             bPortC=(bValue&1)<<nBit;
+        }
+        else  // установка режима, пока просто сброс значений регистров
+        {
+            bPortA=0;
+            bPortB=0;
+            bPortC=0;
         }
     }
 }
@@ -114,15 +121,75 @@ void WritePPIReg(uint16_t wReg, uint8_t bValue)
     switch (cModel)
     {
     case MODEL_R:
-    case MODEL_M:
     case MODEL_A:
     case MODEL_O:
         // rk clones code here
+        port_a_val=PPPI->GetPortA();
+        port_c=PPPI->GetPortC();
+        led_state=(led_state&0xFB)|((PPPI->GetPortC()&0x08)>>1);
+        break;
+    case MODEL_M:
+        // mikrosha code here
+        port_a_val=PPPI->GetPortB();
+        port_c=PPPI->GetPortC();
         break;
     case MODEL_S:
         // specialist code here
-        ;
+        port_c=PPPI->GetPortC();
+        port_ac_s=PPPI->GetPortA()|((PPPI->GetPortC()&0x0F)<<8);
+        ctrl_keys_s=PPPI->GetPortB()&0x03;
+        snd_state=PPPI->GetPortC()&0x0F;
+        cur_color_code=color_table[(PPPI->GetPortC()&0xC0)>>6];
     }
+}
+
+uint8_t ReadPPIReg(uint16_t wReg)
+{
+    int i;
+    uint8_t bMatrixIn, bMatrixOut;
+    uint16_t wMatrixIn, wMatrixOut;
+
+    switch (cModel)
+    {
+    case MODEL_R:
+    case MODEL_A:
+    case MODEL_O:
+        // rk clones code here
+        bMatrixIn=0xFF;
+        bMatrixOut=PPPI->GetPortA();
+        for (int i=0;i<8;i++)
+        {
+            if (!(bMatrixOut&1))
+                bMatrixIn&=key_bytes[i];
+            bMatrixOut>>=1;
+        }
+        PPPI->SetPortB(bMatrixIn);
+        break;
+    case MODEL_M:
+        // mikrosha code here
+        bMatrixIn=0xFF;
+        bMatrixOut=PPPI->GetPortB();
+        for (int i=0;i<8;i++)
+        {
+            if (!(bMatrixOut&1))
+                bMatrixIn&=key_bytes[i];
+            bMatrixOut>>=1;
+        }
+        PPPI->SetPortA(bMatrixIn);
+        break;
+    case MODEL_S:
+        // specialist code here
+        bMatrixIn=0x00;
+        wMatrixOut=((PPPI->GetPortC()&0x0F)<<8) & PPPI->GetPortA(); // port_ac_s
+        for (int i=0;i<8;i++)
+        {
+            wMatrixIn>>=1;
+            if (key_bytes_s[i]==0xFFF)
+                wMatrixIn|=0x80;
+        }
+        PPPI->SetPortB(bMatrixIn|(PPPI->GetPortB()&0x03)); //ctrl_keys_s;
+    }
+    return PPPI2->ReadReg(wReg);
 }
 
 void WritePPI2Reg(uint16_t wReg, uint8_t bValue)

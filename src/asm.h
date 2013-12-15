@@ -149,6 +149,20 @@ extern "C" char f_quit;                  //
 
 extern "C" unsigned char snd_state;                  //
 
+extern "C" unsigned char port_a_val;
+extern "C" unsigned char port_c;
+extern "C" unsigned short port_ac_s;
+extern "C" unsigned char cur_color_code;
+extern "C" unsigned char led_state;
+
+extern "C" unsigned char key_bytes[9]; // 9 - с ctrl_keys
+extern "C" unsigned char ctrl_keys;
+extern "C" unsigned short key_bytes_s[7];// 7 - с ctrl_keys_s
+extern "C" unsigned short ctrl_keys_s;
+
+extern "C" char color_table[4];        // таблица соответствия цветов
+
+
 extern "C" unsigned short reg_af;      // регистр AF
 extern "C" unsigned short reg_bc;      // регистр BC
 extern "C" unsigned short reg_de;      // регистр DE

@@ -55,6 +55,10 @@ cglobal use_io_space
 
 cglobal snd_state
 
+cglobal port_a_val
+cglobal port_ac_s
+cglobal cur_color_code
+
 cglobal SaveByte
 cglobal LoadByte
 cglobal SavePort
@@ -116,18 +120,20 @@ cextern ReadPPIReg    ; dword
 cextern WritePPI2Reg   ; dword
 cextern ReadPPI2Reg    ; dword
 
+cextern led_state     ; byte !!!
+
+cextern key_bytes     ; byte
+cextern ctrl_keys     ; byte
+cextern key_bytes_s   ;
+cextern ctrl_keys_s
+[extern joy_state]     ; byte
+
 [extern symtable_ptr]  ; dword
 [extern cur_offs]      ;
 ;[extern f_vid]         ; byte
 ;[extern refresh_scr]   ; dword
 ;[extern draw_scr_or]   ; dword ?
 [extern set_video_auto]; dword ?
-[extern key_bytes]     ; byte
-[extern ctrl_keys]     ; byte
-[extern joy_state]     ; byte
-[extern key_bytes_s]   ;
-[extern ctrl_keys_s]   ;
-[extern led_state]     ; byte !!!
 [extern rst6]               ; dword
 [extern set_delay_w_dma]    ; dword
 [extern set_delay_wo_dma]   ; dword
@@ -210,10 +216,6 @@ cur_x:
 db 0
 cur_y:
 db 0
-
-pit_val0 db 0
-pit_val1 db 0
-pit_val2 db 0
 
 old_or_scrpage db 0ffh
 old_or_colormode db 0ffh
