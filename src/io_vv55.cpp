@@ -44,13 +44,13 @@ void TPPI8255::InitDevice()
     bPortA=0;
     bPortB=0;
     bPortC=0;
-    bPortAReadValue=0;
-    bPortBReadValue=0;
-    bPortCReadValue=0;
-    pcmChAMode=pcmRead;
-    pcmChBMode=pcmRead;
-    pcmChCHiMode=pcmRead;
-    pcmChCLowMode=pcmRead;
+    bPortAInput=0;
+    bPortBInput=0;
+    bPortCInput=0;
+    pcmChAMode=pcmIn;
+    pcmChBMode=pcmIn;
+    pcmChCHiMode=pcmIn;
+    pcmChCLowMode=pcmIn;
 }
 
 void TPPI8255::WriteReg(uint16_t wReg, uint8_t bValue)
@@ -59,46 +59,46 @@ void TPPI8255::WriteReg(uint16_t wReg, uint8_t bValue)
     switch(wReg)
     {
     case 0:
-        if (pcmChAMode==pcmWrite)
+        if (pcmChAMode==pcmOut)
             bPortA = bValue;
         break;
     case 1:
-        if (pcmChAMode==pcmWrite)
+        if (pcmChBMode==pcmOut)
             bPortB = bValue;
         break;
     case 2:
-        if (pcmChCHiMode==pcmWrite)
+        if (pcmChCHiMode==pcmOut)
             bPortC = bPortC&0x0F | bValue&0xF0;
-        if (pcmChCLowMode==pcmWrite)
+        if (pcmChCLowMode==pcmOut)
             bPortC = bPortC&0xF0 | bValue&0x0F;
         break;
     default: //ctrl reg
         if (!(bValue&0x80))
         {
             int nBit=(bValue&0x0e)>>1;
-            if ((nBit<4 && pcmChCLowMode==pcmWrite) || (nBit>4 && pcmChCHiMode==pcmWrite))
+            if ((nBit<4 && pcmChCLowMode==pcmOut) || (nBit>=4 && pcmChCHiMode==pcmOut))
             {
                 uint8_t bMask = ~(1<<nBit);
-                bPortC&=~bMask;
-                bPortC=(bValue&1)<<nBit;
+                bPortC&=bMask;
+                bPortC|=((bValue&1)<<nBit);
             }
         }
         else if (!(bValue&0x40)) // установка режима, недвунаправленный режим        {
         {
-            bPortA=0;
-            bPortB=0;
-            bPortC=0;
-            pcmChAMode=bValue&0x20?pcmWrite:pcmRead;
-            pcmChBMode=bValue&0x02?pcmWrite:pcmRead;
-            pcmChCHiMode=bValue&0x10?pcmWrite:pcmRead;
-            pcmChCLowMode=bValue&0x01?pcmWrite:pcmRead;
+            bPortA=0x0;
+            bPortB=0x0;
+            bPortC=0x0;
+            pcmChAMode=bValue&0x10?pcmIn:pcmOut;
+            pcmChBMode=bValue&0x02?pcmIn:pcmOut;
+            pcmChCHiMode=bValue&0x08?pcmIn:pcmOut;
+            pcmChCLowMode=bValue&0x01?pcmIn:pcmOut;
             // режимы 0 и 1 пока не различаются
         }
         else // двунаправленный режим, пока просто сброс значений регистров
         {
-            bPortA=0;
-            bPortB=0;
-            bPortC=0;
+            bPortA=0x0;
+            bPortB=0x0;
+            bPortC=0x0;
         }
 
     }
@@ -112,12 +112,12 @@ uint8_t TPPI8255::ReadReg(uint16_t wReg)
     switch(wReg)
     {
     case 0:
-        return pcmChAMode==pcmWrite?bPortA:bPortAReadValue;
+        return pcmChAMode==pcmOut?bPortA:bPortAInput;
     case 1:
-        return pcmChBMode==pcmWrite?bPortB:bPortBReadValue;
+        return pcmChBMode==pcmOut?bPortB:bPortBInput;
     case 2:
-        bByte=(pcmChCHiMode==pcmWrite?bPortC:bPortCReadValue)&0xF0;;
-        bByte|=((pcmChCLowMode==pcmWrite?bPortC:bPortCReadValue)&0x0F);;
+        bByte=(pcmChCHiMode==pcmOut?bPortC:bPortCInput)&0xF0;;
+        bByte|=((pcmChCLowMode==pcmOut?bPortC:bPortCInput)&0x0F);;
         return bByte;
     default: // ctrl reg
         return 0xFF; // undefined
@@ -157,7 +157,7 @@ void WritePPIReg(uint16_t wReg, uint8_t bValue)
 uint8_t ReadPPIReg(uint16_t wReg)
 {
     PerformPPIInput();
-    return PPPI2->ReadReg(wReg);
+    return PPPI->ReadReg(wReg);
 }
 
 void PerformPPIInput()
@@ -171,6 +171,7 @@ void PerformPPIInput()
     case MODEL_R:
     case MODEL_A:
     case MODEL_O:
+    case MODEL_P:
         // rk clones code here
         bMatrixIn=0xFF;
         bMatrixOut=PPPI->GetPortA();
@@ -180,7 +181,9 @@ void PerformPPIInput()
                 bMatrixIn&=key_bytes[i];
             bMatrixOut>>=1;
         }
-        PPPI->SetPortBReadValue(bMatrixIn);
+        PPPI->SetPortBInput(bMatrixIn);
+//        port_c=PPPI->GetPortC()&0x0F | ctrl_keys&0xF0; //!!!
+        PPPI->SetPortCInput(ctrl_keys&0xF0 | PPPI->GetPortC()&0x0F);
         break;
     case MODEL_M:
         // mikrosha code here
@@ -192,19 +195,37 @@ void PerformPPIInput()
                 bMatrixIn&=key_bytes[i];
             bMatrixOut>>=1;
         }
-        PPPI->SetPortAReadValue(bMatrixIn);
+        PPPI->SetPortAInput(bMatrixIn);
+//        port_c=port_c&0x0f | ctrl_keys&0xF0; //!!!
+        PPPI->SetPortCInput(ctrl_keys&0xF0 | PPPI->GetPortC()&0x0F);
         break;
     case MODEL_S:
         // specialist code here
-        bMatrixIn=0x00;
-        wMatrixOut=((PPPI->GetPortC()&0x0F)<<8) & PPPI->GetPortA(); // port_ac_s
-        for (int i=0;i<8;i++)
+        if (PPPI->GetChAMode()==pcmOut && PPPI->GetChBMode()==pcmIn && PPPI->GetChCLowMode()==pcmOut)
         {
-            wMatrixIn>>=1;
-            if (key_bytes_s[i]==0xFFF)
-                wMatrixIn|=0x80;
+            bMatrixIn=0x00;
+            wMatrixOut=((PPPI->GetPortC()&0x0F)<<8) | PPPI->GetPortA(); // port_ac_s
+            for (int i=0;i<6;i++)
+            {
+                bMatrixIn>>=1;
+                if ((key_bytes_s[i] | wMatrixOut)==0xFFF)
+                    bMatrixIn|=0x80;
+            }
+            PPPI->SetPortBInput(bMatrixIn | ctrl_keys_s&0x03);
         }
-        PPPI->SetPortBReadValue(bMatrixIn|(PPPI->GetPortB()&0x03)); //ctrl_keys_s;
+        else if (PPPI->GetChAMode()==pcmIn && PPPI->GetChBMode()==pcmOut && PPPI->GetChCLowMode()==pcmIn)
+        {
+            wMatrixIn=0xFFF;
+            bMatrixOut=PPPI->GetPortB()>>2;
+            for (int i=0;i<6;i++)
+            {
+                if (!(bMatrixOut&1))
+                    wMatrixIn&=key_bytes_s[i];
+                bMatrixOut>>=1;
+            }
+            PPPI->SetPortAInput(wMatrixIn&0xFF);
+            PPPI->SetPortCInput((wMatrixIn&0xF00)>>8);
+        }
     }
 }
 
@@ -215,24 +236,44 @@ void PerformPPIOutput()
     case MODEL_R:
     case MODEL_A:
     case MODEL_O:
+    case MODEL_P:
         // rk clones code here
         port_a_val=PPPI->GetPortA();
-        port_c=PPPI->GetPortC();
+        port_c=(PPPI->GetPortCInput()&0xF0) | (PPPI->GetPortC()&0x0F);
         led_state=(led_state&0xFB)|((PPPI->GetPortC()&0x08)>>1);
         break;
     case MODEL_M:
         // mikrosha code here
         port_a_val=PPPI->GetPortB();
-        port_c=PPPI->GetPortC();
+        port_c=(PPPI->GetPortCInput()&0xF0) | (PPPI->GetPortC()&0x0F);
+        led_state=(led_state&0xFB)|((PPPI->GetPortC()&0x08)>>1);
         break;
     case MODEL_S:
         // specialist code here
-        port_c=PPPI->GetPortC();
+        port_c=PPPI->GetPortC()&0xF0;
         port_ac_s=PPPI->GetPortA()|((PPPI->GetPortC()&0x0F)<<8);
-        ctrl_keys_s=PPPI->GetPortB()&0x03;
-        snd_state=PPPI->GetPortC()&0x0F;
+        snd_state=PPPI->GetPortC()&0xF0;
         cur_color_code=color_table[(PPPI->GetPortC()&0xC0)>>6];
     }
+}
+
+uint8_t PPIGetPortC()
+{
+switch (cModel)
+    {
+    case MODEL_R:
+    case MODEL_A:
+    case MODEL_O:
+    case MODEL_P:
+        return PPPI->GetPortC()&0x0F;
+    case MODEL_S:
+        return PPPI->GetPortC()&0xF0;
+    }
+}
+
+void PPISetPortC(uint8_t bValue)
+{
+    PPPI->SetPortC(bValue);
 }
 
 void WritePPI2Reg(uint16_t wReg, uint8_t bValue)

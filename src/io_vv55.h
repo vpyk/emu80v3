@@ -6,9 +6,9 @@
 
 enum TPPIChMode
 {
-    pcmWrite=0,
-    pcmRead=1//,
-//    pcmReadWrite=2
+    pcmOut=0,
+    pcmIn=1//,
+//    pcmInOut=2
 };
 
 
@@ -27,17 +27,24 @@ class TPPI8255 : public TIODevice
         void SetPortA(uint8_t bValue) {bPortA=bValue;};
         void SetPortB(uint8_t bValue) {bPortB=bValue;};
         void SetPortC(uint8_t bValue) {bPortC=bValue;};
-        void SetPortAReadValue(uint8_t bValue) {bPortAReadValue=bValue;};
-        void SetPortBReadValue(uint8_t bValue) {bPortBReadValue=bValue;};
-        void SetPortCReadValue(uint8_t bValue) {bPortCReadValue=bValue;};
+        void SetPortAInput(uint8_t bValue) {bPortAInput=bValue;};
+        void SetPortBInput(uint8_t bValue) {bPortBInput=bValue;};
+        void SetPortCInput(uint8_t bValue) {bPortCInput=bValue;};
+        uint8_t GetPortAInput() {return bPortAInput;};
+        uint8_t GetPortBInput() {return bPortBInput;};
+        uint8_t GetPortCInput() {return bPortCInput;};
+        TPPIChMode GetChAMode() {return pcmChAMode;};
+        TPPIChMode GetChBMode() {return pcmChBMode;};
+        TPPIChMode GetChCHiMode() {return pcmChCHiMode;};
+        TPPIChMode GetChCLowMode() {return pcmChCLowMode;};
     protected:
     private:
         uint8_t bPortA;
         uint8_t bPortB;
         uint8_t bPortC;
-        uint8_t bPortAReadValue;
-        uint8_t bPortBReadValue;
-        uint8_t bPortCReadValue;
+        uint8_t bPortAInput;
+        uint8_t bPortBInput;
+        uint8_t bPortCInput;
         TPPIChMode pcmChAMode;
         TPPIChMode pcmChBMode;
         TPPIChMode pcmChCHiMode;
@@ -51,7 +58,7 @@ void PerformPPIInput();
 void PerformPPIOutput();
 extern "C" void WritePPI2Reg(uint16_t wReg, uint8_t bValue);
 extern "C" uint8_t ReadPPI2Reg(uint16_t wReg);
-//void LoadPPIState(RKSS_PPI_STATE *ppiState);
-//void SavePPIState(RKSS_PPI_STATE *ppiState);
+uint8_t PPIGetPortC();
+void PPISetPortC(uint8_t bValue);
 
 #endif // _PPI8255_H

@@ -41,6 +41,7 @@
 #include "misc.h"
 #include "sound.h"
 #include "io_vi53.h"
+#include "io_vv55.h"
 
 void Emulate(int nSamples); //!!!
 
@@ -594,7 +595,7 @@ switch (cModel)
     rrh.wDmaBegAddr=dma_begadr;
     rrh.wDmaLen=dma_len;
     rrh.cCrtMReg=crt_mreg;
-    rrh.cPortC=port_c&0xf;
+    rrh.cPortC=PPIGetPortC();
     rrh.cCurX=cur_x;
     rrh.cCurY=cur_y;
 
@@ -634,7 +635,7 @@ switch (cModel)
     rph.wDmaBegAddr=dma_begadr;
     rph.wDmaLen=dma_len;
     rph.cCrtMReg=crt_mreg;
-    rph.cPortC=port_c&0xf;
+    rph.cPortC=PPIGetPortC();
     rph.cCurX=cur_x;
     rph.cCurY=cur_y;
     fwrite(&rph,sizeof(rph),1,f);
@@ -658,7 +659,7 @@ switch (cModel)
     rmh.wDmaBegAddr=dma_begadr;
     rmh.wDmaLen=dma_len;
     rmh.cCrtMReg=crt_mreg;
-    rmh.cPortC=port_c&0xf;
+    rmh.cPortC=PPIGetPortC();
     rmh.cPPI2B=mikr_symg;
     rmh.cCurX=cur_x;
     rmh.cCurY=cur_y;
@@ -700,7 +701,7 @@ switch (cModel)
     rah.wDmaBegAddr=dma_begadr;
     rah.wDmaLen=dma_len;
     rah.cCrtMReg=crt_mreg;
-    rah.cPortC=port_c&0xf;
+    rah.cPortC=PPIGetPortC();
     rah.cCurX=cur_x;
     rah.cCurY=cur_y;
 
@@ -728,7 +729,7 @@ switch (cModel)
     memset(&rsh,0,sizeof(rsh));
     rsh.cMonVer=cMonitor;
     rsh.wHeaderLen=sizeof(rsh)+3072+3;
-    rsh.cPortC=port_c&0xf0;
+    rsh.cPortC=PPIGetPortC();
     fwrite(&rsh,sizeof(rsh),1,f);
     // –¢¥â (5æ¢.)
     b=0x01;
@@ -755,7 +756,7 @@ switch (cModel)
     memset(&roh,0,sizeof(roh));
     roh.cMonVer=cMonitor;
     roh.wHeaderLen=sizeof(roh);
-    roh.cPortC=port_c&0xf;
+    roh.cPortC=PPIGetPortC();
     roh.cMemPage=mem_page_no;
     roh.cScrPage=or_scrpage;
     roh.cColorMode=or_color_mode;
@@ -1095,7 +1096,7 @@ if (cModel==MODEL_R)
   crt_mreg=rrh.cCrtMReg;
   dma_begadr=rrh.wDmaBegAddr;
   dma_len=rrh.wDmaLen;
-  port_c=rrh.cPortC;
+  PPISetPortC(rrh.cPortC);
   cur_x=rrh.cCurX;
   cur_y=rrh.cCurY;
   if (dma_begadr==0xffff)
@@ -1152,7 +1153,7 @@ else if (cModel==MODEL_P)
   crt_mreg=rph.cCrtMReg;
   dma_begadr=rph.wDmaBegAddr;
   dma_len=rph.wDmaLen;
-  port_c=rph.cPortC;
+  PPISetPortC(rph.cPortC);
   cur_x=rph.cCurX;
   cur_y=rph.cCurY;
   if (dma_begadr==0xffff)
@@ -1201,7 +1202,7 @@ else if (cModel==MODEL_M)
   crt_mreg=rmh.cCrtMReg;
   dma_begadr=rmh.wDmaBegAddr;
   dma_len=rmh.wDmaLen;
-  port_c=rmh.cPortC;
+  PPISetPortC(rmh.cPortC);
   mikr_symg=rmh.cPPI2B;
   cur_x=rmh.cCurX;
   cur_y=rmh.cCurY;
@@ -1268,7 +1269,7 @@ else if (cModel==MODEL_A)
   crt_mreg=rah.cCrtMReg;
   dma_begadr=rah.wDmaBegAddr;
   dma_len=rah.wDmaLen;
-  port_c=rah.cPortC;
+  PPISetPortC(rah.cPortC);
   cur_x=rah.cCurX;
   cur_y=rah.cCurY;
   if (dma_begadr==0xffff)
@@ -1333,7 +1334,7 @@ else if (cModel==MODEL_S)
     MonitorWarning();
     cMonitor=0;
     }
-  port_c=rsh.cPortC;
+  PPISetPortC(rsh.cPortC);
   }
 else if (cModel==MODEL_O)
   {
@@ -1351,7 +1352,7 @@ else if (cModel==MODEL_O)
     MonitorWarning();
     cMonitor=0;
     }
-  port_c=roh.cPortC;
+  PPISetPortC(roh.cPortC);
   or_scrpage=roh.cScrPage;
   mem_page_no=roh.cMemPage;
   or_color_mode=roh.cColorMode;
@@ -1453,7 +1454,7 @@ Init();
 
 //SetModel();
 process_crt();
-process_port_c();
+//process_port_c();
 
 return 1;
 }

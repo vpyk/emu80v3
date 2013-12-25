@@ -28,7 +28,7 @@ cglobal scr_end
 cglobal cur_xy
 cglobal cur_x
 cglobal cur_y
-cglobal process_port_c
+;cglobal process_port_c
 cglobal port_c
 cglobal cur_corr
 cglobal keybin_port
@@ -810,187 +810,16 @@ sdd2:   ret
 
 ; Ёмул€ци€ PPI
 ppi1_out:
-
-        cmp byte [cModel],MODEL_P
-        jne ppim_1
-
-        cmp bp,0d903h
-        cmp bp,0d902h
-        je near ppi1_c
-        cmp bp,0d903h
-        je near ppi1_r
-        cmp bp,0d900h
-        je near ppi1_a
-        ret
-
-ppim_1:
-        cmp byte [cModel],MODEL_M
-        jne ppim_2
-
-        and bp,0c003h
-        cmp bp,0c002h
-        je near ppi1_c
-;       cmp bp,0c003h
-;       je ppi1_r
-        cmp bp,0c001h
-        je near ppi1_a
-        ret
-
-ppim_2:
-        cmp byte [cModel],MODEL_R
-        jne ppim_3
-
-        and bp,3
-        cmp bp,0002h
-        je near ppi1_c
-        cmp bp,0000h
-        je near ppi1_a
-        ret
-
-ppim_3:
-        cmp byte [cModel],MODEL_A
-        jne ppim_7
-
-        and bp,0ed03h
-        cmp bp,0ed02h
-        je ppi1_c
-        cmp bp,0ed00h
-        je near ppi1_a
-        ret
-
-ppim_7:
-        cmp byte [cModel],MODEL_S
-        jne ppim_8
-
-        and bp,0f803h
-        cmp bp,0f802h
-        je ppi1_c
-        cmp bp,0f803h
-        je near ppi1_r
-        cmp bp,0f801h
-        je ppi1_b_out_s
-        mov byte [port_ac_s],ah
-        ret
-
-ppim_8:
-        and bp,3
-        cmp bp,02h
-        je ppi1_c
-        cmp bp,00h
-        je near ppi1_a
-        ret
-
-ppi1_b_out_s:
-        push ax
-        and ah,0fch
-        and byte [ctrl_keys_s],3
-        or byte [ctrl_keys_s],ah
-        pop ax
-        ret
-
-; ќбрабатывает состо€ние порта C ѕѕј
-process_port_c:
-        push ax
-        mov ah, byte [port_c]
-        jmp kpc4
-;process_port_c endp
-
-; запись в порт C ѕѕј ¬¬55
-; бит 1 - управление динамиком (0-писк)
-ppi1_c:
-        mov byte [port_c],ah
-        push ax
-kpc4:
-
-        cmp byte [cModel],MODEL_S
-        jne ppim_5
-
-        ; —пециалист
-        push ax
-        and ah,0fh
-        mov byte [port_ac_s+1],ah
-        pop ax
-
-        mov byte [snd_state],ah
-
-        ; ÷вет
-        push ebx
+        pusha
+      __align_sp
+        mov al,ah
+        and eax,0FFh
         push eax
-        mov ebx, color_table
-        movzx eax,byte [port_c]
-        rol al,1
-        rol al,1
-        and al,3
-        mov al,byte [ebx+eax]
-        mov byte [cur_color_code],al
-        pop eax
-        pop ebx
-
-; 9 цветов
-;   push ax
-;   mov al,byte ptr cs:[port_c]
-;   rol al,1
-;   rol al,1
-;   rol al,1
-;   and al,6
-;   mov ah,al
-;   mov al,byte ptr cs:[port_c]
-;   rol al,1
-;   rol al,1
-;   rol al,1
-;   rol al,1
-;   and al,1
-;   or al,ah
-;   mov byte ptr cs:[cur_color_code],al
-;   pop ax
-
-ppim_5:
-        and ah,08h
-        ror ah,1
-        and byte [led_state],0fbh
-        or byte [led_state],ah
-;       call light_led
-
-kpc3:   pop ax
-kpc5:   ret
-
-; запись в регистр управл€ющего слова (–”—) ѕѕј
-; отслеживаем только звук (см. выше)
-
-        ;cmp byte ptr cs:[cModel],MODEL_P
-        ;jne kpc4
-
-ppi1_r:
-        cmp ah,80h
-        jb kpc6
-        ; ###########?
-        ; —брос
-        mov byte [port_c],0
-        mov byte [port_a_val],0
-        mov word [port_ac_s],0
-        and byte [ctrl_keys_s],3
-
-        ; ###########?
-        ;mov byte [cur_color_code],00h
-        ;jmp kpc5
-kpc6:
-        push ax
-        push cx
-        mov cl,ah
-        ror cl,1
-        and cl,07h;03h
-        mov al,0feh
-        rol al,cl
-        and byte [port_c],al
-        and ah,1
-        rol ah,cl
-        or byte [port_c],ah
-        mov ah, byte [port_c]
-        pop cx
-        jmp kpc4
-
-ppi1_a:
-        mov byte [port_a_val],ah
+        push ebp
+        call WritePPIReg
+        add esp,8
+      __restore_sp
+        popa
         ret
 
 ; Ёмул€ци€ PIT
@@ -1402,6 +1231,19 @@ ppi2_in3:
         ret
 
 ppi1_in:
+        pusha
+      __align_sp
+        push ebp
+        call ReadPPIReg
+        add esp,4
+        mov byte [temp_byte], al
+      __restore_sp
+        popa
+        mov ah,byte [temp_byte]
+        ret
+
+; ######
+
         push ecx
         push ax
         mov ax,bp

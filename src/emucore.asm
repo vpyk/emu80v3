@@ -90,7 +90,7 @@ cextern EnterInteractiveMode  ;near
 cextern LeaveInteractiveMode  ;near
 cextern SetVideoMode          ;near
 cextern cModel                ;byte
-cextern process_port_c        ;near
+;cextern process_port_c        ;near
 cextern RefreshMenu           ;near
 cextern ClearScreen           ;near
 ;cextern CheckKeys           ;near
@@ -479,7 +479,7 @@ ap2:   cmp byte [f_scr],SCR_GRAPH
        ;call RefreshMenu ; !!!
        jmp ap3
 ap3:    call LeaveInteractiveMode
-       call process_port_c
+;       call process_port_c
         cmp byte [f_chscr],0 ; ???
         jz ap9
         call set_video
