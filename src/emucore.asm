@@ -163,7 +163,6 @@ cextern process_int           ;near
 ;[extern f_novesa]              ;byte
 ;[extern wSBPort]               ;word
 ;[extern wSBDMA]                ;word
-[extern calc_pit]              ;near
 cextern vretr_cnt             ;byte
 [extern translate_sysreq_code] ;near
 [extern ticks_per_calc]        ;!!!word

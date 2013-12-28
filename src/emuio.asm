@@ -58,6 +58,7 @@ cglobal snd_state
 cglobal port_a_val
 cglobal port_ac_s
 cglobal cur_color_code
+cglobal romdisk_addr
 
 cglobal SaveByte
 cglobal LoadByte
@@ -75,7 +76,6 @@ cglobal LoadPort
 [global write_byte_orion_640]
 [global write_byte_orion_800]
 [global cur_color_code]
-[global calc_pit]
 [global ticks_per_calc]
 cglobal vretr_cnt
 [global old_or_colormode]
@@ -126,7 +126,7 @@ cextern key_bytes     ; byte
 cextern ctrl_keys     ; byte
 cextern key_bytes_s   ;
 cextern ctrl_keys_s
-[extern joy_state]     ; byte
+cextern joy_state     ; byte
 
 [extern symtable_ptr]  ; dword
 [extern cur_offs]      ;
@@ -409,7 +409,7 @@ sb_or_1:
         cmp bp,0f500h
         jb near ppi1_out
         cmp bp,0f600h
-        jb near ppird_out
+        jb near ppi2_out
         cmp bp,0f700h
         jb sb00 ; ВВ55 в будущем ?
         cmp bp,0f800h
@@ -667,42 +667,6 @@ or_scrpage_out:
        ret
 ;or_scrpage_out endp
 
-; Эмуляция ROMDISK'а ПК "Орион"
-ppird_out:
-        and bp,3
-        cmp bp,2
-        jne prdi1
-        mov byte [romdisk_addr+1],ah
-        ret
-prdi1:  cmp bp,1
-        jne prdi2
-        mov byte [romdisk_addr],ah
-prdi2:  ret
-;ppird_out endp
-
-ppird_in:
-        and bp,3
-        cmp bp,0
-        jne prdo1
-        push ebp
-        mov ebp, dword [romdisk_mem]
-        push eax
-        movzx eax, word [romdisk_addr]
-        add ebp, eax
-        pop eax
-        mov ah, byte [ebp]
-        pop ebp
-        ret
-prdo1:  cmp bp,1
-        jne prdo2
-        mov ah, byte [romdisk_addr]
-        ret
-prdo2:  cmp bp,2
-        jne prdo3
-        mov ah, byte [romdisk_addr+1]
-prdo3:  ret
-;ppird_in endp
-
 ; Эмуляция ВГ75
 crt_out:
         test bp,1h
@@ -822,6 +786,21 @@ ppi1_out:
         popa
         ret
 
+; Эмуляция PPI2
+; (ROMDISK'а ПК "Орион", знакогенератор ПК "Микроша")
+ppi2_out:
+        pusha
+      __align_sp
+        mov al,ah
+        and eax,0FFh
+        push eax
+        push ebp
+        call WritePPI2Reg
+        add esp,8
+      __restore_sp
+        popa
+        ret
+
 ; Эмуляция PIT
 pit_out:
         pusha
@@ -835,21 +814,6 @@ pit_out:
       __restore_sp
         popa
         ret
-;pit_out endp
-
-ppi2_out:
-        cmp byte [cModel],MODEL_M
-        jne ppi2_1
-        and bp,3
-        cmp bp,1
-        jne ppi2_1
-        push ax
-        mov al,byte [mikr_symg]
-        xor al,ah
-        mov byte [mikr_symg],ah
-        and byte [mikr_symg],80h
-        pop ax
-ppi2_1: ret
 
 dma_out:
         and bp,000fh
@@ -1094,7 +1058,7 @@ lb_or_1:cmp bp,0f400h
         cmp bp,0f500h
         jb near ppi1_in
         cmp bp,0f600h
-        jb ppird_in
+        jb ppi2_in
         cmp bp,0f700h
         jb lbm5_1 ; ####
         cmp bp,0f800h
@@ -1216,20 +1180,6 @@ pit_in:
         mov ah,byte [temp_byte]
         ret
 
-ppi2_in:
-        cmp byte [cModel],MODEL_M
-        jne ppi2_in3
-        and bp,3
-        cmp bp,1
-        jne no_in
-        mov ah,byte [mikr_symg]
-        ret
-ppi2_in3:
-        cmp byte [cModel],MODEL_R
-        jne ppi2_in2
-        mov ah, byte [joy_state]
-        ret
-
 ppi1_in:
         pusha
       __align_sp
@@ -1242,135 +1192,16 @@ ppi1_in:
         mov ah,byte [temp_byte]
         ret
 
-; ######
-
-        push ecx
-        push ax
-        mov ax,bp
-        and al,03h
-
-        cmp byte [cModel],MODEL_S
-        je ppi1_s
-
-        cmp al,byte [keybin_port]
-
-        jne ppi1_1
-
-        push ebx
-        mov ebx, key_bytes
-        mov ecx,8
-        mov ah,0ffh
-        mov al,byte [port_a_val]
-ppi1_2: rcr al,1
-        jc ppi1_3
-        and ah, byte [ebx]
-ppi1_3: inc ebx
-        loop ppi1_2
-        pop ebx
-ppi1_5: mov cl,ah
-        pop ax
-        mov ah,cl
-        pop ecx
-        ret
-ppi1_1: cmp al,2
-        je ppi1_4
-        mov ah,byte [port_a_val]
-        jmp ppi1_5
-ppi1_4: mov ah,byte [ctrl_keys]
-        and ah,0f0h
-        mov al,byte [port_c]
-        and al,0fh
-        or ah,al
-        jmp ppi1_5
-
-ppi1_s:
-        cmp al,1
-        jne ppi1_1_s
-
-        push ebx
-        push bp
-        mov ebx, key_bytes_s
-        xor al,al
-        mov ecx,6
-ppi1_s3:ror al,1
-        mov bp, word [port_ac_s]
-        or bp, word [ebx]
-        cmp bp,0fffh
-        jne ppi1_s4
-        or al,80h
-ppi1_s4:inc ebx
-        inc ebx
-        loop ppi1_s3
-        pop bp
-        pop ebx
-        mov cl, byte [ctrl_keys_s]
-        and cl,3
-        or cl,al
-        pop ax
-        mov ah,cl
-        xor ah,1
-        pop ecx
-;        pop ax
-;        mov ah, byte ptr cs:[ctrl_keys_s]
-;        pop cx
-        ret
-ppi1_1_s: call ppi1_s_or
-        cmp al,0
-        jne ppi1_s2
-        pop ax
-        mov ah,cl
-        pop ecx
-        ret
-ppi1_s2:mov al,byte [port_c]
-        and al,0f0h
-        or ch,al
-        pop ax
-        mov ah,ch
-        pop ecx
-        ret
-
-ppi1_s_or:
-        push ax
-        push ebx
-        push dx
-        mov ebx, key_bytes_s
-        mov ecx,6
-        mov dx,0fffh
-        mov al,byte [ctrl_keys_s]
-        rcr al,1
-        rcr al,1
-ppi1s_2:rcr al,1
-        jc ppi1s_3
-        and dx, word [ebx]
-ppi1s_3:inc ebx
-        inc ebx
-        loop ppi1s_2
-        mov cx,dx
-        pop dx
-        pop ebx
-        pop ax
-        ret
-;ppi1_in endp
-
-; Вызывается каждые 1/44100 с или 50 мс в зависимости от режима.
-; Рассчитывает следующие значения счетчиков и программирует таймер PC
-calc_pit:
-        cmp byte [vretr_cnt],0
-        jz cpt0
-        dec byte [vretr_cnt]
-cpt0:
+ppi2_in:
         pusha
       __align_sp
-        movzx eax,word [ticks_per_calc]
-        push eax
-        call ProcessTime
+        push ebp
+        call ReadPPI2Reg
         add esp,4
-        call GetSample
-        push eax
-        call PlayByteNoWait
-        add esp,4
+        mov byte [temp_byte], al
       __restore_sp
         popa
+        mov ah,byte [temp_byte]
         ret
 
 ; Вызывается при Reset'е эмулируемого компьютера

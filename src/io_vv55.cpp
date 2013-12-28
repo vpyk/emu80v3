@@ -282,11 +282,10 @@ void WritePPI2Reg(uint16_t wReg, uint8_t bValue)
     switch (cModel)
     {
     case MODEL_M:
-        // mikrosha code here
+        mikr_symg=PPPI2->GetPortB() & 0x80;
         break;
     case MODEL_O:
-        // orion code here
-        ;
+        romdisk_addr=PPPI2->GetPortB() | (PPPI2->GetPortC()<<8);
     }
 }
 
@@ -294,12 +293,12 @@ uint8_t ReadPPI2Reg(uint16_t wReg)
 {
     switch (cModel)
     {
-    case MODEL_M:
-        // mikrosha code here
+    case MODEL_R:
+        PPPI2->SetPortAInput(joy_state);
         break;
     case MODEL_O:
         // orion code here
-        ;
+        PPPI2->SetPortAInput(romdisk_mem[romdisk_addr]);
     }
     return PPPI2->ReadReg(wReg);
 }

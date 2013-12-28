@@ -48,7 +48,7 @@ cglobal ctrl_keys
 cglobal key_bytes_s
 cglobal ctrl_keys_s
 
-[global joy_state]
+cglobal joy_state
 
 ;public light_led
 [global f_led]
