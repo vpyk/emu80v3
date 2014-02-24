@@ -83,6 +83,21 @@ struct RKSS_PIT_STATE
   unsigned char bPitLd2;
 };
 
+struct RKSS_DMA_STATE
+{
+  unsigned short wAddr0;
+  unsigned short wAddr1;
+  unsigned short wAddr2;
+  unsigned short wAddr3;
+  unsigned short wLen0;
+  unsigned short wLen1;
+  unsigned short wLen2;
+  unsigned short wLen3;
+  unsigned short bModeReg;
+  unsigned short bStatusReg;
+  bool blLoByte;
+};
+
 struct RKSS_RK_HEADER
   {
   unsigned short wHeaderLen;

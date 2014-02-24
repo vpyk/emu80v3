@@ -42,6 +42,7 @@
 #include "sound.h"
 #include "io_vi53.h"
 #include "io_vv55.h"
+#include "io_vt57.h"
 
 void Emulate(int nSamples); //!!!
 
@@ -1092,17 +1093,10 @@ if (cModel==MODEL_R)
   crt_param_2=rrh.acCrtParams[1];
   crt_param_3=rrh.acCrtParams[2];
   crt_param_4=rrh.acCrtParams[3];
-  dma_mr=rrh.cDmaMR;
   crt_mreg=rrh.cCrtMReg;
-  dma_begadr=rrh.wDmaBegAddr;
-  dma_len=rrh.wDmaLen;
   PPISetPortC(rrh.cPortC);
   cur_x=rrh.cCurX;
   cur_y=rrh.cCurY;
-  if (dma_begadr==0xffff)
-    dma_begadr=sh_scrbeg;
-  if (dma_len==0xffff)
-    dma_len=sh_scrlen-1;
 
   RKSS_PIT_STATE pitState;
   pitState.wPitK0=rrh.wPitK0;
@@ -1118,6 +1112,23 @@ if (cModel==MODEL_R)
   pitState.bPitLd1=rrh.cPitLd1;
   pitState.bPitLd2=rrh.cPitLd2;
   LoadPITState(&pitState);
+
+  RKSS_DMA_STATE dmaState;
+  dmaState.wAddr0=0;
+  dmaState.wAddr1=0;
+  dmaState.wAddr3=0;
+  dmaState.wLen0=0;
+  dmaState.wLen1=0;
+  dmaState.wLen3=0;
+  dmaState.wAddr2=rrh.wDmaBegAddr;
+  dmaState.wLen2=rrh.wDmaLen;
+  dmaState.bModeReg=rrh.cDmaMR;
+  // Temporary !!!
+  if (dmaState.wAddr2==0xffff)
+    dmaState.wAddr2=sh_scrbeg;
+  if (dmaState.wAddr2==0xffff)
+    dmaState.wAddr2=sh_scrlen-1;
+  LoadDMAState(&dmaState);
   }
 else if (cModel==MODEL_P)
   {
@@ -1149,17 +1160,27 @@ else if (cModel==MODEL_P)
   crt_param_2=rph.acCrtParams[1];
   crt_param_3=rph.acCrtParams[2];
   crt_param_4=rph.acCrtParams[3];
-  dma_mr=rph.cDmaMR;
   crt_mreg=rph.cCrtMReg;
-  dma_begadr=rph.wDmaBegAddr;
-  dma_len=rph.wDmaLen;
   PPISetPortC(rph.cPortC);
   cur_x=rph.cCurX;
   cur_y=rph.cCurY;
-  if (dma_begadr==0xffff)
-    dma_begadr=sh_scrbeg;
-  if (dma_len==0xffff)
-    dma_len=sh_scrlen-1;
+
+  RKSS_DMA_STATE dmaState;
+  dmaState.wAddr0=0;
+  dmaState.wAddr1=0;
+  dmaState.wAddr3=0;
+  dmaState.wLen0=0;
+  dmaState.wLen1=0;
+  dmaState.wLen3=0;
+  dmaState.wAddr2=rph.wDmaBegAddr;
+  dmaState.wLen2=rph.wDmaLen;
+  dmaState.bModeReg=rph.cDmaMR;
+  // Temporary !!!
+  if (dmaState.wAddr2==0xffff)
+    dmaState.wAddr2=sh_scrbeg;
+  if (dmaState.wAddr2==0xffff)
+    dmaState.wAddr2=sh_scrlen-1;
+  LoadDMAState(&dmaState);
   }
 else if (cModel==MODEL_M)
   {
@@ -1198,18 +1219,11 @@ else if (cModel==MODEL_M)
   crt_param_2=rmh.acCrtParams[1];
   crt_param_3=rmh.acCrtParams[2];
   crt_param_4=rmh.acCrtParams[3];
-  dma_mr=rmh.cDmaMR;
   crt_mreg=rmh.cCrtMReg;
-  dma_begadr=rmh.wDmaBegAddr;
-  dma_len=rmh.wDmaLen;
   PPISetPortC(rmh.cPortC);
   mikr_symg=rmh.cPPI2B;
   cur_x=rmh.cCurX;
   cur_y=rmh.cCurY;
-  if (dma_begadr==0xffff)
-    dma_begadr=sh_scrbeg;
-  if (dma_len==0xffff)
-    dma_len=sh_scrlen-1;
 
   RKSS_PIT_STATE pitState;
   pitState.wPitK0=rmh.wPitK0;
@@ -1225,6 +1239,24 @@ else if (cModel==MODEL_M)
   pitState.bPitLd1=rmh.cPitLd1;
   pitState.bPitLd2=rmh.cPitLd2;
   LoadPITState(&pitState);
+
+  RKSS_DMA_STATE dmaState;
+  dmaState.wAddr0=0;
+  dmaState.wAddr1=0;
+  dmaState.wAddr3=0;
+  dmaState.wLen0=0;
+  dmaState.wLen1=0;
+  dmaState.wLen3=0;
+  dmaState.wAddr2=rmh.wDmaBegAddr;
+  dmaState.wLen2=rmh.wDmaLen;
+  dmaState.bModeReg=rmh.cDmaMR;
+  // Temporary !!!
+  if (dmaState.wAddr2==0xffff)
+    dmaState.wAddr2=sh_scrbeg;
+  if (dmaState.wAddr2==0xffff)
+    dmaState.wAddr2=sh_scrlen-1;
+  LoadDMAState(&dmaState);
+
   }
 else if (cModel==MODEL_A)
   {
@@ -1265,17 +1297,10 @@ else if (cModel==MODEL_A)
   crt_param_2=rah.acCrtParams[1];
   crt_param_3=rah.acCrtParams[2];
   crt_param_4=rah.acCrtParams[3];
-  dma_mr=rah.cDmaMR;
   crt_mreg=rah.cCrtMReg;
-  dma_begadr=rah.wDmaBegAddr;
-  dma_len=rah.wDmaLen;
   PPISetPortC(rah.cPortC);
   cur_x=rah.cCurX;
   cur_y=rah.cCurY;
-  if (dma_begadr==0xffff)
-    dma_begadr=sh_scrbeg;
-  if (dma_len==0xffff)
-    dma_len=sh_scrlen-1;
 
   RKSS_PIT_STATE pitState;
   pitState.wPitK0=rah.wPitK0;
@@ -1291,6 +1316,23 @@ else if (cModel==MODEL_A)
   pitState.bPitLd1=rah.cPitLd1;
   pitState.bPitLd2=rah.cPitLd2;
   LoadPITState(&pitState);
+
+  RKSS_DMA_STATE dmaState;
+  dmaState.wAddr0=0;
+  dmaState.wAddr1=0;
+  dmaState.wAddr3=0;
+  dmaState.wLen0=0;
+  dmaState.wLen1=0;
+  dmaState.wLen3=0;
+  dmaState.wAddr2=rah.wDmaBegAddr;
+  dmaState.wLen2=rah.wDmaLen;
+  dmaState.bModeReg=rah.cDmaMR;
+  // Temporary !!!
+  if (dmaState.wAddr2==0xffff)
+    dmaState.wAddr2=sh_scrbeg;
+  if (dmaState.wAddr2==0xffff)
+    dmaState.wAddr2=sh_scrlen-1;
+  LoadDMAState(&dmaState);
   }
 else if (cModel==MODEL_S)
   {
@@ -2093,7 +2135,7 @@ void ProcessInt()
         int_flag=0;
         bIntReq=0;
         if (LoadByte(PCPU->get_pc())==0x76)
-            PCPU->set_sp(PCPU->get_sp()+1);
+            PCPU->set_pc(PCPU->get_pc()+1);
         PCPU->i8080_rst6();
         reg_sp=PCPU->get_sp();
         reg_pc=PCPU->get_pc();

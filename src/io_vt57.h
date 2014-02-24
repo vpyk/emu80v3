@@ -52,6 +52,8 @@ public:
     uint16_t GetChAddr(int nChannel);
     uint16_t GetChLen(int nChannel);
     uint8_t GetMR();
+    void LoadDMAState(RKSS_DMA_STATE *dmaState);
+    void SaveDMAState(RKSS_DMA_STATE *dmaState);
 private:
     uint16_t wAddr0;
     uint16_t wAddr1;
@@ -68,7 +70,7 @@ private:
 extern "C" void InitDMA();
 extern "C" void WriteDMAReg(uint16_t wReg, uint8_t bValue);
 extern "C" uint8_t ReadDMAReg(uint16_t wReg);
-//void LoadFDCState(RKSS_FDC_STATE *fdcState);
-//void SaveFDCState(RKSS_FDC_STATE *fdcState);
+void LoadDMAState(RKSS_DMA_STATE *dmaState);
+void SaveDMAState(RKSS_DMA_STATE *dmaState);
 
 #endif // _IO_VT57_H

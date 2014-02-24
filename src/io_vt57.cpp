@@ -199,13 +199,33 @@ uint8_t TDMA8257::GetMR()
     return bModeReg;
 }
 
-/*void TDMA8257::SaveDMAState(RKSS_DMA_STATE *dmaState)
+void TDMA8257::SaveDMAState(RKSS_DMA_STATE *dmaState)
 {
-}*/
+    dmaState->wAddr0=wAddr0;
+    dmaState->wAddr1=wAddr1;
+    dmaState->wAddr2=wAddr2;
+    dmaState->wAddr3=wAddr3;
+    dmaState->wLen0=wLen0;
+    dmaState->wLen1=wLen1;
+    dmaState->wLen2=wLen2;
+    dmaState->wLen3=wLen3;
+    dmaState->bModeReg=bModeReg;
+    dmaState->blLoByte=blLoByte;
+}
 
-/*void TDMA8257::LoadDMAtate(RKSS_DMA_STATE *dmaState)
+void TDMA8257::LoadDMAState(RKSS_DMA_STATE *dmaState)
 {
-}*/
+    wAddr0=dmaState->wAddr0;
+    wAddr1=dmaState->wAddr1;
+    wAddr2=dmaState->wAddr2;
+    wAddr3=dmaState->wAddr3;
+    wLen0=dmaState->wLen0;
+    wLen1=dmaState->wLen1;
+    wLen2=dmaState->wLen2;
+    wLen3=dmaState->wLen3;
+    bModeReg=dmaState->bModeReg;
+    blLoByte=dmaState->blLoByte;
+}
 
 // --- Temporary Stubs for ASM ---------------------------------------------
 
@@ -234,12 +254,15 @@ uint8_t ReadDMAReg(uint16_t wReg)
     return PDMA->ReadReg(wReg);
 }
 
-/*void LoadDMAState(RKSS_DMA_STATE *dmaState)
+void LoadDMAState(RKSS_DMA_STATE *dmaState)
 {
     PDMA->LoadDMAState(dmaState);
+    dma_begadr=PDMA->GetChAddr(2);
+    dma_len=PDMA->GetChLen(2);
+    dma_mr=PDMA->GetMR();
 }
 
 void SaveDMAState(RKSS_DMA_STATE *dmaState)
 {
     PDMA->SaveDMAState(dmaState);
-}*/
+}
