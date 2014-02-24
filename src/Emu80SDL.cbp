@@ -84,6 +84,8 @@
 		<Unit filename="io_vg93.h" />
 		<Unit filename="io_vi53.cpp" />
 		<Unit filename="io_vi53.h" />
+		<Unit filename="io_vt57.cpp" />
+		<Unit filename="io_vt57.h" />
 		<Unit filename="io_vv55.cpp" />
 		<Unit filename="io_vv55.h" />
 		<Unit filename="main.cpp" />

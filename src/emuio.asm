@@ -120,6 +120,10 @@ cextern ReadPPIReg    ; dword
 cextern WritePPI2Reg   ; dword
 cextern ReadPPI2Reg    ; dword
 
+cextern InitDMA       ; dword
+cextern WriteDMAReg   ; dword
+cextern ReadDMAReg   ; dword
+
 cextern led_state     ; byte !!!
 
 cextern key_bytes     ; byte
@@ -815,44 +819,24 @@ pit_out:
         popa
         ret
 
+; Ёмул€ци€ DMA
 dma_out:
-        and bp,000fh
-        cmp bp,4
-        jne do1
-        push cx
-        mov cl,8
-        ror word [dma_begadr],cl
-        pop cx
-        mov byte [dma_begadr+1],ah
-        ret
-do1:    cmp bp,5
-        jne do2
-        push cx
-        mov cl,8
-        ror word [dma_len],cl
-        pop cx
-        mov byte [dma_len+1],ah
-        ret
-do2:    cmp bp,8
-        jne near do3
-        cmp ah, byte [dma_mr]
-        je near do3
-        mov byte [dma_mr],ah
+        pusha
+      __align_sp
+        mov al,ah
+        and eax,0FFh
+        push eax
+        push ebp
+        call WriteDMAReg
+        add esp,8
+      __restore_sp
+        popa
+;        ret
 
         call set_dma_delay
-;        cmp ah,80h
-;        je do5
-;        cmp ah,28h
-;        jne do8
-;        call set_delay_w_dma28
-;        jmp do6
-;do8:    cmp byte ptr cs:[crt_mreg],0e0h
-;        je do5
-;        call set_delay_w_dma
-;        jmp do6
-;do5:    call set_delay_wo_dma
 
-do6:    test ah,4
+do6:    mov ah, byte [dma_mr]
+        test ah,4
         jz near do3
         and word [dma_len],3fffh
         push ax
@@ -1162,7 +1146,6 @@ crt_in:
         jz ci_1
         mov ah,20h
 ci_1:   ret
-dma_in:
 ppi2_in2:
 no_in:
         mov ah,0ffh
@@ -1204,6 +1187,18 @@ ppi2_in:
         mov ah,byte [temp_byte]
         ret
 
+dma_in:
+        pusha
+      __align_sp
+        push ebp
+        call ReadDMAReg
+        add esp,4
+        mov byte [temp_byte], al
+      __restore_sp
+        popa
+        mov ah,byte [temp_byte]
+        ret
+
 ; ¬ызываетс€ при Reset'е эмулируемого компьютера
 perform_reset:
 ; Reset таймера
@@ -1213,6 +1208,7 @@ perform_reset:
         call InitPIT
         call InitFDC
         call InitPPI
+        call InitDMA
       __restore_sp
         popa
 
